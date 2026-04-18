@@ -4,10 +4,19 @@ import { Exercise, NormFormStep, TableAnswer } from '@/types'
 import { WizardTabs } from './WizardTabs'
 import { RuleCard } from './RuleCard'
 import { TableBuilder } from './TableBuilder'
+import { UnfTable } from './UnfTable'
+import { FeedbackPanel } from './FeedbackPanel'
+import { HintPanel } from './HintPanel'
 import { useNormalizationStore } from '@/stores/normalizationStore'
+import { validateAnswer, ValidationResult } from '@/lib/normalizationValidator'
+import { Trophy } from 'lucide-react'
 
 const STEP_ORDER: NormFormStep[] = ['UNF', '1NF', '2NF', '3NF']
 const STEP_INDEX: Record<NormFormStep, number> = { UNF: 0, '1NF': 1, '2NF': 2, '3NF': 3 }
+const NEXT_STEP: Partial<Record<NormFormStep, NormFormStep>> = {
+  '1NF': '2NF',
+  '2NF': '3NF',
+}
 
 const emptyAnswer = (): TableAnswer => ({ columns: [{ name: '', isPK: false }], fds: [] })
 
@@ -19,18 +28,47 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
   const [activeStep, setActiveStep] = useState<NormFormStep>('UNF')
   const [currentAnswer, setCurrentAnswer] = useState<TableAnswer[]>([emptyAnswer()])
   const [showUnfTable, setShowUnfTable] = useState(true)
+  const [feedbackResult, setFeedbackResult] = useState<ValidationResult | null>(null)
+  const [showFeedback, setShowFeedback] = useState(false)
 
-  const { getCompletedSteps, getSavedAnswer } = useNormalizationStore()
+  const { getCompletedSteps, getSavedAnswer, markStepComplete } = useNormalizationStore()
   const completedSteps = getCompletedSteps(exercise.id)
 
   const currentStepDef = exercise.steps[STEP_INDEX[activeStep]]
+  const allStepsComplete = ['1NF', '2NF', '3NF'].every((s) => completedSteps.includes(s as NormFormStep))
 
   const handleTabClick = (step: NormFormStep) => {
     setActiveStep(step)
+    setShowFeedback(false)
+    setFeedbackResult(null)
     if (step !== 'UNF') {
       const saved = getSavedAnswer(exercise.id, step)
       setCurrentAnswer(saved ?? [emptyAnswer()])
     }
+  }
+
+  const handleSubmit = () => {
+    const result = validateAnswer(currentAnswer, currentStepDef.correctAnswer)
+    setFeedbackResult(result)
+    setShowFeedback(true)
+    if (result.pass) {
+      markStepComplete(exercise.id, activeStep, currentAnswer)
+    }
+  }
+
+  const handleContinue = () => {
+    const nextStep = NEXT_STEP[activeStep]
+    if (!nextStep) {
+      // 3NF passed  completion handled by allStepsComplete check
+      setShowFeedback(false)
+      setFeedbackResult(null)
+      return
+    }
+    setActiveStep(nextStep)
+    const saved = getSavedAnswer(exercise.id, nextStep)
+    setCurrentAnswer(saved ?? [emptyAnswer()])
+    setShowFeedback(false)
+    setFeedbackResult(null)
   }
 
   const unfTableData = exercise.unfTable
@@ -42,13 +80,22 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
         <p className="text-sm text-[#71717a]">{exercise.description}</p>
       </div>
 
+      {allStepsComplete && (
+        <div className="mb-6 bg-[#22c55e]/10 border border-[#22c55e]/40 rounded-xl p-4 flex items-center gap-3">
+          <Trophy size={20} className="text-[#22c55e]" />
+          <div>
+            <p className="font-semibold text-[#22c55e]">All steps complete!</p>
+            <p className="text-sm text-[#a1a1aa]">You have successfully normalized this table through 3NF.</p>
+          </div>
+        </div>
+      )}
+
       <WizardTabs
         activeStep={activeStep}
         completedSteps={completedSteps}
         onStepClick={handleTabClick}
       />
 
-      {/* UNF source table — shown on all steps with toggle */}
       {activeStep !== 'UNF' && (
         <div className="mb-6">
           <button
@@ -58,55 +105,11 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
             {showUnfTable ? 'Hide' : 'Show'} source table (UNF)
           </button>
           {showUnfTable && (
-            <div className="mb-4">
-              {/* UnfTable goes here — Plan 03-02 */}
-              <div className="overflow-x-auto rounded-xl border border-[#27272a]">
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr>
-                      {unfTableData.columns.map((col) => {
-                        const isViolating = currentStepDef?.unfViolatingColumns
-                          .map((v) => v.toLowerCase())
-                          .includes(col.toLowerCase())
-                        return (
-                          <th
-                            key={col}
-                            className={`px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide border-b border-[#27272a] ${
-                              isViolating
-                                ? 'bg-[#ef4444]/15 border-b-2 border-[#ef4444] text-[#ef4444]'
-                                : 'bg-[#27272a] text-[#71717a]'
-                            }`}
-                          >
-                            {col}
-                          </th>
-                        )
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {unfTableData.rows.map((row, ri) => (
-                      <tr key={ri} className="border-b border-[#27272a] last:border-0">
-                        {unfTableData.columns.map((col) => {
-                          const isViolating = currentStepDef?.unfViolatingColumns
-                            .map((v) => v.toLowerCase())
-                            .includes(col.toLowerCase())
-                          return (
-                            <td
-                              key={col}
-                              className={`px-4 py-2 text-sm ${
-                                isViolating ? 'bg-[#ef4444]/10 text-[#fca5a5]' : 'text-[#a1a1aa]'
-                              }`}
-                            >
-                              {row[col] ?? ''}
-                            </td>
-                          )
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <UnfTable
+              columns={unfTableData.columns}
+              rows={unfTableData.rows}
+              violatingColumns={currentStepDef?.unfViolatingColumns ?? []}
+            />
           )}
         </div>
       )}
@@ -117,38 +120,15 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
             title={currentStepDef.ruleCardTitle}
             body={currentStepDef.ruleCardBody}
           />
-          <div className="overflow-x-auto rounded-xl border border-[#27272a]">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr>
-                  {unfTableData.columns.map((col) => (
-                    <th
-                      key={col}
-                      className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide bg-[#27272a] text-[#71717a] border-b border-[#27272a]"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {unfTableData.rows.map((row, ri) => (
-                  <tr key={ri} className="border-b border-[#27272a] last:border-0">
-                    {unfTableData.columns.map((col) => (
-                      <td key={col} className="px-4 py-2 text-sm text-[#a1a1aa]">
-                        {row[col] ?? ''}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <UnfTable
+            columns={unfTableData.columns}
+            rows={unfTableData.rows}
+          />
           <button
             onClick={() => setActiveStep('1NF')}
             className="h-11 px-6 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
           >
-            Begin 1NF →
+            Begin 1NF 
           </button>
         </div>
       ) : (
@@ -158,7 +138,13 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
             body={currentStepDef.ruleCardBody}
           />
 
-          {/* HintPanel goes here — Plan 03-02 */}
+          {currentStepDef.hints.length > 0 && (
+            <HintPanel
+              hints={currentStepDef.hints}
+              exerciseId={exercise.id}
+              step={activeStep}
+            />
+          )}
 
           {currentAnswer.map((tableAnswer, idx) => (
             <div key={idx} className="bg-[#1a1a1a] border border-[#27272a] rounded-xl p-5">
@@ -178,7 +164,7 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
             </div>
           ))}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <button
               onClick={() => setCurrentAnswer((prev) => [...prev, emptyAnswer()])}
               className="h-10 px-4 rounded-lg border border-[#27272a] text-sm text-[#71717a] hover:text-[#fafafa] hover:border-[#6366f1]/50 transition-colors"
@@ -195,14 +181,22 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
             )}
           </div>
 
-          <button
-            onClick={() => console.log('Check answer:', currentAnswer)}
-            className="h-11 px-6 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
-          >
-            Check Answer
-          </button>
+          {!(showFeedback && feedbackResult?.pass) && (
+            <button
+              onClick={handleSubmit}
+              className="h-11 px-6 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
+            >
+              Check Answer
+            </button>
+          )}
 
-          {/* FeedbackPanel goes here — Plan 03-02 */}
+          {showFeedback && feedbackResult && (
+            <FeedbackPanel
+              result={feedbackResult}
+              correctAnswer={currentStepDef.correctAnswer}
+              onContinue={feedbackResult.pass ? handleContinue : undefined}
+            />
+          )}
         </div>
       )}
     </div>

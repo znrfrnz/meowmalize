@@ -16,7 +16,7 @@ const modules = [
     title: 'Normalization Simulator',
     description: 'Practice UNF → 1NF → 2NF → 3NF step-by-step.',
     href: '/normalization',
-    enabled: false,
+    enabled: true,
     supportsUpload: false,
   },
   {
@@ -83,3 +83,4 @@ export default function HomePage() {
     </div>
   )
 }
+
