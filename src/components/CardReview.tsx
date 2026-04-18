@@ -72,7 +72,7 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
   function handleSave() {
     const accepted = items.filter((item) => item.accepted).map((item) => item.card)
     setGeneratedCards(accepted)
-    router.push('/flashcards')
+    router.push('/generated')
   }
 
   const acceptedCount = items.filter((i) => i.accepted).length

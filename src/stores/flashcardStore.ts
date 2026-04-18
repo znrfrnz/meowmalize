@@ -13,6 +13,7 @@ interface FlashcardState {
   generatedCards: Flashcard[]
   setGeneratedCards: (cards: Flashcard[]) => void
   clearGeneratedCards: () => void
+  addGeneratedCard: (card: Flashcard) => void
 }
 
 export const useFlashcardStore = create<FlashcardState>()(
@@ -27,6 +28,7 @@ export const useFlashcardStore = create<FlashcardState>()(
       generatedCards: [],
       setGeneratedCards: (cards) => set({ generatedCards: cards }),
       clearGeneratedCards: () => set({ generatedCards: [] }),
+      addGeneratedCard: (card) => set((state) => ({ generatedCards: [...state.generatedCards, card] })),
     }),
     {
       name: 'infoman-flashcard-progress',

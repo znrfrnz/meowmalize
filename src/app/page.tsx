@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { GeneratedDeckCard } from '@/components/GeneratedDeckCard'
 import { BookOpen, Table2, GitFork } from 'lucide-react'
 
 const modules = [
@@ -77,6 +78,7 @@ export default function HomePage() {
             </div>
           )
         })}
+        <GeneratedDeckCard />
       </div>
     </div>
   )
