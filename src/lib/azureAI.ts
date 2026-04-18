@@ -1,22 +1,22 @@
-import { AzureOpenAI } from 'openai'
+import { AzureOpenAI, OpenAI } from 'openai'
 import { Flashcard } from '@/types'
 
 const SYSTEM_PROMPT = `You are a flashcard generator for an Information Management course.
 Extract key concepts from the provided lecture text and generate flashcards.
 
 Output a JSON object with a "cards" array. Each card must have:
-- "type": either "definition" (single concept explained) or "enumeration" (a list of items)
+- "type": either "definition" (default) or "enumeration" (rare — see strict rules below)
 - "term": the concept name or question (concise, under 60 chars)
 - "definition": the explanation (for "definition" type)
 - "items": array of strings (for "enumeration" type only)
 - "itemCount": number of items (for "enumeration" type only, equals items.length)
 
-Rules:
-- Generate as many cards as the content warrants — do not limit artificially
-- Use "enumeration" only when the content is genuinely a list (steps, rules, types)
-- Keep terms and definitions concise and pedagogically useful
-- Output ONLY the JSON object, no markdown, no explanation`
-
+Flashcard generation rules:
+1. DEFAULT TO DEFINITION: Create one definition card per concept. If a paragraph introduces one concept, that is one card.
+2. ENUMERATION IS RARE: Use "enumeration" ONLY when the source text presents a clearly numbered list, a sequence of ordered steps, or an explicit hierarchy (e.g., "The 7 layers of OSI are: 1. Physical 2. Data Link..."). It is NOT for advantages, disadvantages, characteristics, or any sentence containing "include", "consist of", "are", or "have".
+3. DO NOT COLLAPSE: When a paragraph lists multiple named concepts (e.g., "Data, Information, and Metadata are the three types..."), create ONE SEPARATE definition card per named concept — not one enumeration card covering all of them.
+4. QUANTITY: Generate as many cards as there are distinct named concepts. A lecture with 14 concepts yields ~14 cards.
+5. Output ONLY the JSON object, no markdown, no explanation.`
 function getClient(): AzureOpenAI {
   const endpoint = process.env.AZURE_AI_ENDPOINT
   const key = process.env.AZURE_AI_KEY
