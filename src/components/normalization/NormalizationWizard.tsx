@@ -10,6 +10,8 @@ import { HintPanel } from './HintPanel'
 import { useNormalizationStore } from '@/stores/normalizationStore'
 import { validateAnswer, ValidationResult } from '@/lib/normalizationValidator'
 import { Trophy } from 'lucide-react'
+import Link from 'next/link'
+import { getErdExercise } from '@/data/erdExercises'
 
 const STEP_ORDER: NormFormStep[] = ['UNF', '1NF', '2NF', '3NF']
 const STEP_INDEX: Record<NormFormStep, number> = { UNF: 0, '1NF': 1, '2NF': 2, '3NF': 3 }
@@ -36,6 +38,7 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
 
   const currentStepDef = exercise.steps[STEP_INDEX[activeStep]]
   const allStepsComplete = ['1NF', '2NF', '3NF'].every((s) => completedSteps.includes(s as NormFormStep))
+  const matchingErdExercise = getErdExercise(exercise.id)
 
   const handleTabClick = (step: NormFormStep) => {
     setActiveStep(step)
@@ -86,6 +89,14 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
           <div>
             <p className="font-semibold text-[#22c55e]">All steps complete!</p>
             <p className="text-sm text-[#a1a1aa]">You have successfully normalized this table through 3NF.</p>
+            {matchingErdExercise && (
+              <Link
+                href={`/erd/${exercise.id}`}
+                className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#6366f1] hover:text-[#818cf8] transition-colors font-medium"
+              >
+                Now draw the ERD
+              </Link>
+            )}
           </div>
         </div>
       )}

@@ -24,7 +24,7 @@ const modules = [
     title: 'ERD Simulator',
     description: "Draw Crow's Foot entity-relationship diagrams.",
     href: '/erd',
-    enabled: false,
+    enabled: true,
     supportsUpload: false,
   },
 ]
