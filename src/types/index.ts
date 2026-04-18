@@ -76,3 +76,73 @@ export interface NormalizationProgress {
     hintIndexes: Partial<Record<NormFormStep, number>>
   }
 }
+
+//  ERD Simulator Types 
+
+export type ErdAttributeRole = 'PK' | 'FK' | 'Attribute'
+
+export type ErdCardinality =
+  | 'mandatory-one'
+  | 'mandatory-many'
+  | 'optional-one'
+  | 'optional-many'
+
+export interface ErdAttribute {
+  id: string
+  name: string
+  role: ErdAttributeRole
+}
+
+export interface ErdEntity {
+  id: string
+  tableName: string
+  attributes: ErdAttribute[]
+}
+
+export interface ErdRelationship {
+  id: string
+  sourceEntityId: string
+  targetEntityId: string
+  sourceCardinality: ErdCardinality
+  targetCardinality: ErdCardinality
+  sourceLabel?: string
+  targetLabel?: string
+}
+
+export interface ErdAnswer {
+  entities: ErdEntity[]
+  relationships: ErdRelationship[]
+}
+
+export interface ErdExercise {
+  id: string
+  title: string
+  description: string
+  referenceAnswer: ErdAnswer
+}
+
+export type ErdElementStatus = 'correct' | 'incorrect' | 'extra'
+
+export interface ErdAttributeResult {
+  attributeId: string
+  name: string
+  status: ErdElementStatus
+}
+
+export interface ErdEntityResult {
+  entityId: string
+  tableName: string
+  status: ErdElementStatus
+  attributeResults: ErdAttributeResult[]
+}
+
+export interface ErdRelationshipResult {
+  relationshipId: string
+  status: ErdElementStatus
+}
+
+export interface ErdValidationResult {
+  entityResults: ErdEntityResult[]
+  relationshipResults: ErdRelationshipResult[]
+  isFullyCorrect: boolean
+}
