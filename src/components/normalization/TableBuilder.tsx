@@ -44,7 +44,7 @@ export function TableBuilder({ value, onChange }: TableBuilderProps) {
               value={col.name}
               onChange={(e) => updateColumn(i, 'name', e.target.value)}
               placeholder="Column name"
-              className="flex-1 h-9 px-3 rounded-lg bg-[#27272a] border border-[#3f3f46] text-sm text-[#fafafa] placeholder:text-[#52525b] focus:outline-none focus:border-[#6366f1]/60"
+              className="flex-1 h-9 px-3 rounded-xl bg-[#0a0a0b] border border-[#232326] text-sm text-[#f4f4f5] placeholder:text-[#3f3f46] focus:outline-none focus:border-[#6366f1]/40 transition-colors"
             />
             <label className="flex items-center gap-1.5 text-sm text-[#a1a1aa] cursor-pointer select-none">
               <input
@@ -58,7 +58,7 @@ export function TableBuilder({ value, onChange }: TableBuilderProps) {
             <button
               onClick={() => removeColumn(i)}
               disabled={value.columns.length <= 1}
-              className="p-1.5 rounded-lg text-[#71717a] hover:text-[#ef4444] hover:bg-[#ef4444]/10 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              className="p-1.5 rounded-xl text-[#71717a] hover:text-[#f87171] hover:bg-[#f87171]/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-300"
               aria-label="Remove column"
             >
               <Trash2 size={14} />

@@ -16,22 +16,22 @@ export default function DeckStudyPage({ params }: PageProps) {
 
   if (!deck) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="max-w-3xl mx-auto px-6 py-10">
         <p className="text-[#71717a] mb-4">Deck not found.</p>
-        <Link href="/decks" className="text-[#6366f1] hover:text-[#a5b4fc] text-sm transition-colors">
-          &larr; Back to Decks
+        <Link href="/decks" className="text-[#6366f1] hover:text-[#a5b4fc] text-sm transition-colors duration-300">
+          &larr; Back to decks
         </Link>
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <div className="max-w-3xl mx-auto px-6 py-10 animate-fade-up">
       <div className="mb-6">
-        <Link href="/decks" className="text-[#71717a] hover:text-[#fafafa] text-sm transition-colors">
-          &larr; Back to Decks
+        <Link href="/decks" className="text-[#71717a] hover:text-[#f4f4f5] text-sm transition-colors duration-300">
+          &larr; Back to decks
         </Link>
-        <h1 className="text-2xl font-bold mt-2">{deck.name}</h1>
+        <h1 className="text-2xl font-bold mt-2 tracking-tight">{deck.name}</h1>
       </div>
       {deck.cards.length === 0 ? (
         <div className="flex flex-col items-center gap-6 py-16 text-center">
@@ -39,14 +39,14 @@ export default function DeckStudyPage({ params }: PageProps) {
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href={'/generate?deckId=' + deck.id}
-              className="flex items-center justify-center gap-2 h-11 px-5 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
+              className="flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] active:scale-[0.97] transition-all duration-300"
             >
               <Sparkles size={15} />
               Import from slides
             </Link>
             <Link
               href={'/decks/' + deck.id + '/add-card'}
-              className="flex items-center justify-center gap-2 h-11 px-5 rounded-lg border border-[#27272a] text-[#fafafa] text-sm font-medium hover:border-[#6366f1]/50 hover:text-[#a5b4fc] transition-colors"
+              className="flex items-center justify-center gap-2 h-11 px-5 rounded-xl border border-[#232326] text-[#f4f4f5] text-sm font-medium hover:border-[#3f3f46] hover:text-[#a5b4fc] active:scale-[0.97] transition-all duration-300"
             >
               <Plus size={15} />
               Add flashcard

@@ -77,22 +77,22 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
   const unfTableData = exercise.unfTable
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
+    <div className="max-w-4xl mx-auto px-6 py-10 animate-fade-up">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1">{exercise.title}</h1>
+        <h1 className="text-2xl font-bold mb-1 tracking-tight">{exercise.title}</h1>
         <p className="text-sm text-[#71717a]">{exercise.description}</p>
       </div>
 
       {allStepsComplete && (
-        <div className="mb-6 bg-[#22c55e]/10 border border-[#22c55e]/40 rounded-xl p-4 flex items-center gap-3">
-          <Trophy size={20} className="text-[#22c55e]" />
+        <div className="mb-6 bg-[#34d399]/10 border border-[#34d399]/30 rounded-2xl p-4 flex items-center gap-3">
+          <Trophy size={20} className="text-[#34d399]" />
           <div>
-            <p className="font-semibold text-[#22c55e]">All steps complete!</p>
+            <p className="font-semibold text-[#34d399]">All steps complete</p>
             <p className="text-sm text-[#a1a1aa]">You have successfully normalized this table through 3NF.</p>
             {matchingErdExercise && (
               <Link
                 href={`/erd/${exercise.id}`}
-                className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#6366f1] hover:text-[#818cf8] transition-colors font-medium"
+                className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#6366f1] hover:text-[#818cf8] transition-colors duration-300 font-medium"
               >
                 Now draw the ERD
               </Link>
@@ -111,7 +111,7 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
         <div className="mb-6">
           <button
             onClick={() => setShowUnfTable((v) => !v)}
-            className="text-xs text-[#71717a] hover:text-[#fafafa] underline underline-offset-2 mb-2 transition-colors"
+            className="text-xs text-[#71717a] hover:text-[#f4f4f5] underline underline-offset-2 mb-2 transition-colors duration-300"
           >
             {showUnfTable ? 'Hide' : 'Show'} source table (UNF)
           </button>
@@ -137,7 +137,7 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
           />
           <button
             onClick={() => setActiveStep('1NF')}
-            className="h-11 px-6 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
+            className="h-11 px-6 rounded-xl bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] active:scale-[0.97] transition-all duration-300"
           >
             Begin 1NF 
           </button>
@@ -158,7 +158,7 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
           )}
 
           {currentAnswer.map((tableAnswer, idx) => (
-            <div key={idx} className="bg-[#1a1a1a] border border-[#27272a] rounded-xl p-5">
+            <div key={idx} className="bg-[#141414] border border-[#232326] rounded-2xl p-5">
               {currentAnswer.length > 1 && (
                 <h3 className="text-xs text-[#71717a] uppercase tracking-wide mb-4">
                   Table {idx + 1}
@@ -178,14 +178,14 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
           <div className="flex gap-3 flex-wrap">
             <button
               onClick={() => setCurrentAnswer((prev) => [...prev, emptyAnswer()])}
-              className="h-10 px-4 rounded-lg border border-[#27272a] text-sm text-[#71717a] hover:text-[#fafafa] hover:border-[#6366f1]/50 transition-colors"
+              className="h-10 px-4 rounded-xl border border-[#232326] text-sm text-[#71717a] hover:text-[#f4f4f5] hover:border-[#3f3f46] active:scale-[0.97] transition-all duration-300"
             >
               + Add table
             </button>
             {currentAnswer.length > 1 && (
               <button
                 onClick={() => setCurrentAnswer((prev) => prev.slice(0, -1))}
-                className="h-10 px-4 rounded-lg border border-[#27272a] text-sm text-[#71717a] hover:text-[#ef4444] hover:border-[#ef4444]/50 transition-colors"
+                className="h-10 px-4 rounded-xl border border-[#232326] text-sm text-[#71717a] hover:text-[#f87171] hover:border-[#f87171]/40 active:scale-[0.97] transition-all duration-300"
               >
                 Remove last table
               </button>
@@ -195,9 +195,9 @@ export function NormalizationWizard({ exercise }: NormalizationWizardProps) {
           {!(showFeedback && feedbackResult?.pass) && (
             <button
               onClick={handleSubmit}
-              className="h-11 px-6 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
+              className="h-11 px-6 rounded-xl bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] active:scale-[0.97] transition-all duration-300"
             >
-              Check Answer
+              Check answer
             </button>
           )}
 

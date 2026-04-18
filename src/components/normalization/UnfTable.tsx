@@ -8,7 +8,7 @@ export function UnfTable({ columns, rows, violatingColumns = [] }: UnfTableProps
   const violatingSet = new Set(violatingColumns.map((v) => v.toLowerCase()))
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-[#27272a]">
+    <div className="overflow-x-auto rounded-2xl border border-[#232326]">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr>
@@ -17,10 +17,10 @@ export function UnfTable({ columns, rows, violatingColumns = [] }: UnfTableProps
               return (
                 <th
                   key={col}
-                  className={`px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide border-b border-[#27272a] ${
+                  className={`px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide border-b border-[#232326] ${
                     isViolating
-                      ? 'bg-[#ef4444]/15 border-b-2 border-[#ef4444] text-[#ef4444]'
-                      : 'bg-[#27272a] text-[#71717a]'
+                      ? 'bg-[#f87171]/15 border-b-2 border-[#f87171] text-[#f87171]'
+                      : 'bg-[#141414] text-[#71717a]'
                   }`}
                 >
                   {col}
@@ -31,14 +31,14 @@ export function UnfTable({ columns, rows, violatingColumns = [] }: UnfTableProps
         </thead>
         <tbody>
           {rows.map((row, ri) => (
-            <tr key={ri} className="border-b border-[#27272a] last:border-0">
+            <tr key={ri} className="border-b border-[#232326] last:border-0">
               {columns.map((col) => {
                 const isViolating = violatingSet.has(col.toLowerCase())
                 return (
                   <td
                     key={col}
                     className={`px-4 py-2 ${
-                      isViolating ? 'bg-[#ef4444]/10 text-[#fca5a5]' : 'text-[#a1a1aa]'
+                      isViolating ? 'bg-[#f87171]/10 text-[#fca5a5]' : 'text-[#a1a1aa]'
                     }`}
                   >
                     {row[col] ?? ''}

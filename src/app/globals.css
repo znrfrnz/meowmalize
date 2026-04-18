@@ -4,12 +4,22 @@
   --font-sans: 'Geist', sans-serif;
   --font-mono: 'Geist Mono', monospace;
   --color-accent: #6366f1;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-destructive: #ef4444;
+  --color-accent-hover: #818cf8;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-destructive: #f87171;
   --color-muted: #71717a;
-  --color-surface: #1a1a1a;
-  --color-border: #27272a;
+  --color-surface: #141414;
+  --color-surface-raised: #1c1c1e;
+  --color-border: #232326;
+  --color-border-hover: #3f3f46;
+  --color-bg: #0a0a0b;
+  --color-text: #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* Flashcard flip animation */
@@ -18,4 +28,58 @@
   .card-backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
   .card-rotated { transform: rotateY(180deg); }
   .card-perspective { perspective: 1000px; }
+}
+
+/* Entry animations */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(1.04) translateY(-1px); }
+}
+@keyframes cat-idle {
+  0%       { transform: translateY(0) rotate(0deg); }
+  15%      { transform: translateY(-2px) rotate(-2deg); }
+  30%      { transform: translateY(0) rotate(0deg); }
+  45%      { transform: translateY(-1px) rotate(1.5deg); }
+  60%      { transform: translateY(1px) rotate(-1deg); }
+  75%      { transform: translateY(-1.5px) rotate(0.5deg); }
+  100%     { transform: translateY(0) rotate(0deg); }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.4s ease both;
+  }
+  .stagger-1 { animation-delay: 60ms; }
+  .stagger-2 { animation-delay: 120ms; }
+  .stagger-3 { animation-delay: 180ms; }
+  .stagger-4 { animation-delay: 240ms; }
+  .stagger-5 { animation-delay: 300ms; }
+}
+
+/* Noise overlay for texture */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
 }

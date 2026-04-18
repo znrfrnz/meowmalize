@@ -33,7 +33,9 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
       accepted: true,
       editing: false,
       editTerm: card.term,
-      editDefinition: card.definition,
+      editDefinition: card.type === 'enumeration' && card.items?.length
+        ? card.items.join('\n')
+        : card.definition,
     }))
   )
 
@@ -53,15 +55,20 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
     setItems((prev) =>
       prev.map((item, i) => {
         if (i !== idx) return item
-        return {
-          ...item,
-          editing: false,
-          card: {
-            ...item.card,
-            term: item.editTerm.trim() || item.card.term,
-            definition: item.editDefinition.trim() || item.card.definition,
-          },
+        const editedText = item.editDefinition.trim()
+        const isEnum = item.card.type === 'enumeration'
+        const updatedCard = {
+          ...item.card,
+          term: item.editTerm.trim() || item.card.term,
         }
+        if (isEnum) {
+          const newItems = editedText.split('\n').map((s) => s.trim()).filter(Boolean)
+          updatedCard.items = newItems
+          updatedCard.itemCount = newItems.length
+        } else {
+          updatedCard.definition = editedText || item.card.definition
+        }
+        return { ...item, editing: false, card: updatedCard }
       })
     )
   }
@@ -97,17 +104,17 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
   const acceptedCount = items.filter((i) => i.accepted).length
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
+    <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col gap-6 animate-fade-up">
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 rounded-lg bg-[#27272a] text-[#71717a] hover:text-[#fafafa] transition-colors"
+          className="p-2 rounded-xl bg-[#141414] border border-[#232326] text-[#71717a] hover:text-[#f4f4f5] hover:border-[#3f3f46] active:scale-[0.95] transition-all duration-300"
         >
           <ChevronLeft size={16} />
         </button>
         <div>
-          <h1 className="text-xl font-bold text-[#fafafa]">Review Generated Cards</h1>
-          <p className="text-xs text-[#71717a]">
+          <h1 className="text-xl font-bold text-[#f4f4f5] tracking-tight">Review generated cards</h1>
+          <p className="text-xs text-[#3f3f46] font-mono tabular-nums">
             {acceptedCount} of {items.length} accepted
           </p>
         </div>
@@ -117,15 +124,15 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
       <div className="flex gap-2">
         <button
           onClick={acceptAll}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#22c55e]/10 text-[#22c55e] text-xs font-medium hover:bg-[#22c55e]/20 transition-colors border border-[#22c55e]/20"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#34d399]/10 text-[#34d399] text-xs font-medium hover:bg-[#34d399]/20 active:scale-[0.95] transition-all duration-300 border border-[#34d399]/20"
         >
-          <Check size={12} /> Accept All
+          <Check size={12} /> Accept all
         </button>
         <button
           onClick={rejectAll}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ef4444]/10 text-[#ef4444] text-xs font-medium hover:bg-[#ef4444]/20 transition-colors border border-[#ef4444]/20"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f87171]/10 text-[#f87171] text-xs font-medium hover:bg-[#f87171]/20 active:scale-[0.95] transition-all duration-300 border border-[#f87171]/20"
         >
-          <X size={12} /> Reject All
+          <X size={12} /> Reject all
         </button>
       </div>
 
@@ -134,20 +141,20 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
         {items.map((item, idx) => (
           <div
             key={item.card.id}
-            className={`border rounded-xl p-4 transition-all ${
+            className={`border rounded-2xl p-4 transition-all duration-300 ${
               item.accepted
-                ? 'border-[#27272a] bg-[#1a1a1a]'
-                : 'border-[#27272a]/40 bg-[#1a1a1a]/40 opacity-50'
+                ? 'border-[#232326] bg-[#141414]'
+                : 'border-[#232326]/40 bg-[#141414]/40 opacity-50'
             }`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 {/* Type badge */}
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mb-2 ${
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium mb-2 ${
                     item.card.type === 'definition'
-                      ? 'bg-indigo-900 text-indigo-300'
-                      : 'bg-violet-900 text-violet-300'
+                      ? 'bg-[#6366f1]/10 text-[#a5b4fc] border border-[#6366f1]/20'
+                      : 'bg-[#a78bfa]/10 text-[#c4b5fd] border border-[#a78bfa]/20'
                   }`}
                 >
                   {item.card.type === 'definition' ? 'Definition' : 'Enumeration'}
@@ -165,7 +172,7 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
                         )
                       }
                       placeholder="Term"
-                      className="w-full bg-[#27272a] border border-[#27272a] rounded-lg px-3 py-1.5 text-sm text-[#fafafa] focus:outline-none focus:border-[#6366f1]"
+                      className="w-full bg-[#0a0a0b] border border-[#232326] rounded-xl px-3 py-1.5 text-sm text-[#f4f4f5] focus:outline-none focus:border-[#6366f1]/40 transition-colors"
                     />
                     <textarea
                       value={item.editDefinition}
@@ -176,13 +183,13 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
                           )
                         )
                       }
-                      placeholder="Definition"
-                      rows={3}
-                      className="w-full bg-[#27272a] border border-[#27272a] rounded-lg px-3 py-1.5 text-sm text-[#fafafa] focus:outline-none focus:border-[#6366f1] resize-none"
+                      placeholder={item.card.type === 'enumeration' ? 'One item per line' : 'Definition'}
+                      rows={item.card.type === 'enumeration' ? Math.max(3, (item.editDefinition.split('\n').length || 3)) : 3}
+                      className="w-full bg-[#0a0a0b] border border-[#232326] rounded-xl px-3 py-1.5 text-sm text-[#f4f4f5] focus:outline-none focus:border-[#6366f1]/40 resize-none transition-colors"
                     />
                     <button
                       onClick={() => saveEdit(idx)}
-                      className="self-start px-3 py-1 rounded-lg bg-[#6366f1] text-white text-xs font-medium hover:bg-[#4f46e5] transition-colors"
+                      className="self-start px-3 py-1 rounded-xl bg-[#6366f1] text-white text-xs font-medium hover:bg-[#818cf8] active:scale-[0.95] transition-all duration-300"
                     >
                       Save
                     </button>
@@ -193,15 +200,18 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
                     className="cursor-pointer group"
                     title="Click to edit"
                   >
-                    <p className="text-sm font-semibold text-[#fafafa] group-hover:text-[#6366f1] transition-colors">
+                    <p className="text-sm font-semibold text-[#f4f4f5] group-hover:text-[#a5b4fc] transition-colors duration-300">
                       {item.card.term}
                     </p>
-                    <p className="text-xs text-[#71717a] mt-0.5 line-clamp-2">
-                      {item.card.definition}
-                    </p>
-                    {item.card.type === 'enumeration' && (
-                      <p className="text-xs text-[#6366f1] mt-0.5 font-mono">
-                        List {item.card.itemCount} items
+                    {item.card.type === 'enumeration' && item.card.items?.length ? (
+                      <ol className="mt-1 space-y-0.5 list-decimal list-inside">
+                        {item.card.items.map((it, i) => (
+                          <li key={i} className="text-xs text-[#a1a1aa]">{it}</li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <p className="text-xs text-[#71717a] mt-0.5 line-clamp-2">
+                        {item.card.definition}
                       </p>
                     )}
                   </div>
@@ -211,10 +221,10 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
               {/* Accept/Reject toggle */}
               <button
                 onClick={() => toggle(idx)}
-                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center active:scale-[0.9] transition-all duration-300 ${
                   item.accepted
-                    ? 'bg-[#22c55e] text-white hover:bg-[#16a34a]'
-                    : 'bg-[#27272a] text-[#71717a] hover:bg-[#ef4444] hover:text-white'
+                    ? 'bg-[#34d399] text-[#052e16] hover:bg-[#6ee7b7]'
+                    : 'bg-[#232326] text-[#71717a] hover:bg-[#f87171] hover:text-white'
                 }`}
               >
                 {item.accepted ? <Check size={14} /> : <X size={14} />}
@@ -226,18 +236,18 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
 
       {/* Deck name + folder picker  only shown when creating a new deck */}
       {!targetDeckId && (
-      <div className="flex flex-col gap-3 p-4 border border-[#27272a] rounded-xl bg-[#1a1a1a]">
+      <div className="flex flex-col gap-3 p-4 border border-[#232326] rounded-2xl bg-[#141414]">
         <div>
-          <label className="text-xs text-[#71717a] mb-1 block">Deck name</label>
+          <label className="text-xs text-[#3f3f46] mb-1 block">Deck name</label>
           <input
             value={deckNameInput}
             onChange={(e) => setDeckNameInput(e.target.value)}
             placeholder="My Generated Deck"
-            className="w-full bg-[#0f0f0f] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#fafafa] placeholder-[#71717a] focus:outline-none focus:border-[#6366f1]"
+            className="w-full bg-[#0a0a0b] border border-[#232326] rounded-xl px-3 py-2 text-sm text-[#f4f4f5] placeholder-[#3f3f46] focus:outline-none focus:border-[#6366f1]/40 transition-colors"
           />
         </div>
         <div>
-          <label className="text-xs text-[#71717a] mb-1 block">Save to folder</label>
+          <label className="text-xs text-[#3f3f46] mb-1 block">Save to folder</label>
           <select
             value={creatingFolder ? '__new__' : (selectedFolderId ?? '')}
             onChange={(e) => {
@@ -249,7 +259,7 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
                 setSelectedFolderId(e.target.value || null)
               }
             }}
-            className="w-full bg-[#0f0f0f] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#fafafa] focus:outline-none focus:border-[#6366f1]"
+            className="w-full bg-[#0a0a0b] border border-[#232326] rounded-xl px-3 py-2 text-sm text-[#f4f4f5] focus:outline-none focus:border-[#6366f1]/40 transition-colors"
           >
             <option value="">Ungrouped</option>
             {folders.map((f) => (
@@ -264,7 +274,7 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             placeholder="New folder name..."
-            className="w-full bg-[#0f0f0f] border border-[#6366f1] rounded-lg px-3 py-2 text-sm text-[#fafafa] placeholder-[#71717a] focus:outline-none"
+            className="w-full bg-[#0a0a0b] border border-[#6366f1]/40 rounded-xl px-3 py-2 text-sm text-[#f4f4f5] placeholder-[#3f3f46] focus:outline-none focus:border-[#6366f1] transition-colors"
           />
         )}
       </div>
@@ -274,9 +284,9 @@ export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
       <button
         onClick={handleSave}
         disabled={acceptedCount === 0}
-        className="h-11 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="h-11 rounded-xl bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-300"
       >
-        Save {acceptedCount} Card{acceptedCount !== 1 ? 's' : ''} to Deck
+        Save {acceptedCount} card{acceptedCount !== 1 ? 's' : ''} to deck
       </button>
     </div>
   )

@@ -1,22 +1,32 @@
 import { AzureOpenAI, OpenAI } from 'openai'
 import { Flashcard } from '@/types'
 
-const SYSTEM_PROMPT = `You are a flashcard generator for an Information Management course.
-Extract key concepts from the provided lecture text and generate flashcards.
+const SYSTEM_PROMPT = `Flashcard generator for Information Management. Input: lecture slides/PDF text (may be fragmented). Output: JSON {"cards":[...]}.
 
-Output a JSON object with a "cards" array. Each card must have:
-- "type": either "definition" (default) or "enumeration" (rare — see strict rules below)
-- "term": the concept name or question (concise, under 60 chars)
-- "definition": the explanation (for "definition" type)
-- "items": array of strings (for "enumeration" type only)
-- "itemCount": number of items (for "enumeration" type only, equals items.length)
+Card schema:
+- type: "definition" | "enumeration"
+- term: concept name (<60 chars)
+- definition: exam-ready explanation (definition type only)
+- items: string[] (enumeration type only)
+- itemCount: items.length (enumeration type only)
 
-Flashcard generation rules:
-1. DEFAULT TO DEFINITION: Create one definition card per concept. If a paragraph introduces one concept, that is one card.
-2. ENUMERATION IS RARE: Use "enumeration" ONLY when the source text presents a clearly numbered list, a sequence of ordered steps, or an explicit hierarchy (e.g., "The 7 layers of OSI are: 1. Physical 2. Data Link..."). It is NOT for advantages, disadvantages, characteristics, or any sentence containing "include", "consist of", "are", or "have".
-3. DO NOT COLLAPSE: When a paragraph lists multiple named concepts (e.g., "Data, Information, and Metadata are the three types..."), create ONE SEPARATE definition card per named concept — not one enumeration card covering all of them.
-4. QUANTITY: Generate as many cards as there are distinct named concepts. A lecture with 14 concepts yields ~14 cards.
-5. Output ONLY the JSON object, no markdown, no explanation.`
+Type rules:
+- ENUMERATION if answer is a list of 3+ items: advantages, disadvantages, types, steps, properties, components, phases, features, characteristics, categories.
+- DEFINITION if answer is a paragraph explaining what/how/why.
+- Never collapse a list into prose like "X include A, B, C." — use enumeration.
+- COMBO: if list items are themselves concepts, make 1 enumeration + N definition cards.
+
+Examples:
+{"type":"enumeration","term":"Disadvantages of Traditional File Processing","items":["Data redundancy","Limited data sharing","Program-data dependence","Excessive program maintenance","Lengthy development times"],"itemCount":5}
+{"type":"enumeration","term":"ACID Properties","items":["Atomicity","Consistency","Isolation","Durability"],"itemCount":4}
+{"type":"definition","term":"Atomicity","definition":"A transaction is treated as a single indivisible unit — either all operations complete successfully, or none are applied."}
+{"type":"definition","term":"DBMS","definition":"Software that manages creation, maintenance, and use of databases, providing an interface between data and applications."}
+
+Rules:
+1. Go deep: expand every named concept into its own card. "Flat files → Hierarchical → Relational" = enumeration + definition per model.
+2. Expand fragments: write full definitions even from bullet points.
+3. 15-40 cards per lecture. Skip noise (page numbers, names, dates(not timeline dates)).
+4. Output ONLY the JSON object.`
 function getClient(): AzureOpenAI {
   const endpoint = process.env.AZURE_AI_ENDPOINT
   const key = process.env.AZURE_AI_KEY
@@ -41,7 +51,7 @@ async function callAI(text: string): Promise<Flashcard[]> {
       { role: 'user', content: `Generate flashcards from this lecture content:\n\n${text}` },
     ],
     response_format: { type: 'json_object' },
-    max_tokens: 4096,
+    max_tokens: 8192,
   })
 
   const content = response.choices?.[0]?.message?.content
@@ -52,17 +62,18 @@ async function callAI(text: string): Promise<Flashcard[]> {
 
   return parsed.cards.map((card: unknown, i: number) => {
     const c = card as Record<string, unknown>
+    const type = (c.type === 'enumeration' ? 'enumeration' : 'definition') as 'definition' | 'enumeration'
     const base = {
       id: `gen-${Date.now()}-${i}`,
-      type: (c.type === 'enumeration' ? 'enumeration' : 'definition') as 'definition' | 'enumeration',
+      type,
       term: String(c.term ?? '').trim(),
       definition: String(c.definition ?? '').trim(),
     }
-    if (base.type === 'enumeration' && Array.isArray(c.items)) {
+    if (type === 'enumeration' && Array.isArray(c.items)) {
       return { ...base, items: (c.items as unknown[]).map(String), itemCount: (c.items as unknown[]).length }
     }
     return base
-  }).filter((c) => c.term && c.definition)
+  }).filter((c) => c.term && (c.definition || (c.type === 'enumeration' && 'items' in c)))
 }
 
 export async function generateFlashcards(

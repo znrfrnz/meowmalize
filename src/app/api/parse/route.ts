@@ -1,23 +1,20 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
-import { parseOffice, OfficeParserAST } from 'officeparser'
+import { parseOffice } from 'officeparser'
+import { extractText as extractPdfText } from 'unpdf'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
 const MAX_BYTES = 4.5 * 1024 * 1024 // 4.5 MB
 
-function extractText(ast: OfficeParserAST): string {
-  function walk(nodes: typeof ast.content): string {
-    return nodes
-      .map((node) => {
-        const childText = node.children ? walk(node.children) : ''
-        const nodeText = node.text ?? childText
-        return nodeText
-      })
-      .filter(Boolean)
-      .join('\n')
+async function extractText(buffer: Buffer, fileName: string): Promise<string> {
+  if (fileName.match(/\.pdf$/i)) {
+    const { text } = await extractPdfText(new Uint8Array(buffer))
+    return text.join('\n')
   }
-  return walk(ast.content)
+  // PPTX/PPT — use officeparser
+  const ast = await parseOffice(buffer, { outputErrorToConsole: false })
+  return ast.toText()
 }
 
 export async function POST(req: NextRequest) {
@@ -56,8 +53,7 @@ export async function POST(req: NextRequest) {
 
       const arrayBuffer = await file.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
-      const ast = await parseOffice(buffer, { outputErrorToConsole: false })
-      const text = extractText(ast)
+      const text = await extractText(buffer, file.name)
 
       if (!text || text.trim().length < 10) {
         return NextResponse.json(

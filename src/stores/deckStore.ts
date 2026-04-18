@@ -8,7 +8,7 @@ export const BUILTIN_DECK_ID = 'builtin-flashcards'
 
 const BUILTIN_DECK: Deck = {
   id: BUILTIN_DECK_ID,
-  name: 'Database Concepts',
+  name: 'Free reviewer by @cjdlsnt_ on Instagram',
   folderId: null,
   cards: FLASHCARDS,
   createdAt: '2026-01-01T00:00:00.000Z',

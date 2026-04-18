@@ -21,7 +21,7 @@ export function WizardTabs({ activeStep, completedSteps, onStepClick }: WizardTa
   }
 
   return (
-    <div className="flex border-b border-[#27272a] mb-6">
+    <div className="flex border-b border-[#232326] mb-6">
       {STEPS.map((step) => {
         const completed = allCompleted.includes(step)
         const active = activeStep === step
@@ -32,11 +32,11 @@ export function WizardTabs({ activeStep, completedSteps, onStepClick }: WizardTa
             key={step}
             onClick={() => clickable && onStepClick(step)}
             disabled={!clickable}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-all duration-300 ${
               active
-                ? 'border-[#6366f1] text-[#6366f1]'
+                ? 'border-[#6366f1] text-[#a5b4fc]'
                 : completed
-                ? 'border-transparent text-[#a1a1aa] hover:text-[#fafafa]'
+                ? 'border-transparent text-[#a1a1aa] hover:text-[#f4f4f5]'
                 : 'border-transparent text-[#71717a] opacity-40 cursor-not-allowed'
             }`}
           >

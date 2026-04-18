@@ -5,7 +5,7 @@ import { useErdStore } from '@/stores/erdStore'
 import { compareErd } from '@/lib/erdValidator'
 import type { ErdExercise, ErdValidationResult, ErdAnswer, ErdAttributeRole, ErdCardinality } from '@/types'
 import type { Node, Edge } from '@xyflow/react'
-import { CheckCircle, XCircle, RotateCcw } from 'lucide-react'
+import { CheckCircle, XCircle, RotateCcw, ChevronDown, ChevronRight, Table2 } from 'lucide-react'
 
 interface ErdExerciseWizardProps {
   exercise: ErdExercise
@@ -40,9 +40,16 @@ function toErdAnswer(nodes: Node[], edges: Edge[]): ErdAnswer {
   return { entities, relationships }
 }
 
+const roleBadge: Record<ErdAttributeRole, string> = {
+  PK: 'text-[#6366f1] font-semibold',
+  FK: 'text-[#f59e0b]',
+  Attribute: 'text-[#a1a1aa]',
+}
+
 export function ErdExerciseWizard({ exercise }: ErdExerciseWizardProps) {
   const { nodes, edges, clearCanvas } = useErdStore()
   const [validationResult, setValidationResult] = useState<ErdValidationResult | null>(null)
+  const [refOpen, setRefOpen] = useState(true)
 
   const handleCheckAnswer = useCallback(() => {
     const studentAnswer = toErdAnswer(nodes, edges)
@@ -55,7 +62,7 @@ export function ErdExerciseWizard({ exercise }: ErdExerciseWizardProps) {
     setValidationResult(null)
   }, [clearCanvas])
 
-  // Build validation overlay map: elementId → status
+  // Build validation overlay map: elementId -> status
   const validationOverlay = validationResult
     ? new Map<string, 'correct' | 'incorrect' | 'extra'>([
         ...validationResult.entityResults.map(
@@ -75,28 +82,64 @@ export function ErdExerciseWizard({ exercise }: ErdExerciseWizardProps) {
     ? validationResult.entityResults.length + validationResult.relationshipResults.length
     : 0
 
+  const refEntities = exercise.referenceAnswer.entities
+
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-[calc(100vh-5rem)]">
       {/* Exercise header */}
-      <div className="px-6 py-4 border-b border-[#27272a] bg-[#0f0f0f] flex items-start justify-between gap-4 flex-shrink-0">
+      <div className="px-6 py-4 border-b border-[#232326] bg-[#0a0a0b] flex items-start justify-between gap-4 flex-shrink-0">
         <div className="max-w-2xl">
-          <h1 className="text-lg font-semibold text-[#fafafa] mb-1">{exercise.title}</h1>
+          <h1 className="text-lg font-semibold text-[#f4f4f5] mb-1 tracking-tight">{exercise.title}</h1>
           <p className="text-sm text-[#71717a]">{exercise.description}</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#71717a] border border-[#27272a] rounded-lg hover:border-[#71717a] transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#71717a] border border-[#232326] rounded-xl hover:border-[#3f3f46] active:scale-[0.95] transition-all duration-300"
           >
             <RotateCcw size={13} /> Reset
           </button>
           <button
             onClick={handleCheckAnswer}
-            className="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-[#6366f1] hover:bg-[#4f52c7] text-white rounded-lg transition-colors font-medium"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-sm bg-[#6366f1] hover:bg-[#818cf8] text-white rounded-xl active:scale-[0.97] transition-all duration-300 font-medium"
           >
-            Check Answer
+            Check answer
           </button>
         </div>
+      </div>
+
+      {/* 3NF Reference Tables */}
+      <div className="border-b border-[#232326] bg-[#0a0a0b] flex-shrink-0">
+        <button
+          onClick={() => setRefOpen(!refOpen)}
+          className="w-full px-6 py-2.5 flex items-center gap-2 text-xs font-medium text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors duration-300"
+        >
+          <Table2 size={13} />
+          <span>3NF Reference Tables</span>
+          {refOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+        </button>
+        {refOpen && (
+          <div className="px-6 pb-4 flex gap-3 overflow-x-auto">
+            {refEntities.map((entity) => (
+              <div
+                key={entity.id}
+                className="min-w-[140px] border border-[#232326] rounded-2xl bg-[#141414] text-xs flex-shrink-0"
+              >
+                <div className="px-3 py-1.5 border-b border-[#232326] bg-[#1c1c1e] rounded-t-2xl">
+                  <span className="font-semibold text-[#f4f4f5]">{entity.tableName}</span>
+                </div>
+                <div className="px-3 py-1.5 space-y-0.5">
+                  {entity.attributes.map((attr) => (
+                    <div key={attr.id} className="flex items-center justify-between gap-2">
+                      <span className="text-[#d4d4d8]">{attr.name}</span>
+                      <span className={`text-[10px] ${roleBadge[attr.role]}`}>{attr.role}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Validation result banner */}
@@ -104,18 +147,18 @@ export function ErdExerciseWizard({ exercise }: ErdExerciseWizardProps) {
         <div
           className={`px-6 py-3 border-b flex items-center gap-3 flex-shrink-0 ${
             validationResult.isFullyCorrect
-              ? 'bg-[#22c55e]/10 border-[#22c55e]/40'
-              : 'bg-[#ef4444]/10 border-[#ef4444]/40'
+              ? 'bg-[#34d399]/10 border-[#34d399]/30'
+              : 'bg-[#f87171]/10 border-[#f87171]/30'
           }`}
         >
           {validationResult.isFullyCorrect ? (
-            <CheckCircle size={16} className="text-[#22c55e]" />
+            <CheckCircle size={16} className="text-[#34d399]" />
           ) : (
-            <XCircle size={16} className="text-[#ef4444]" />
+            <XCircle size={16} className="text-[#f87171]" />
           )}
           <span
             className={`text-sm font-medium ${
-              validationResult.isFullyCorrect ? 'text-[#22c55e]' : 'text-[#ef4444]'
+              validationResult.isFullyCorrect ? 'text-[#34d399]' : 'text-[#f87171]'
             }`}
           >
             {validationResult.isFullyCorrect
@@ -126,14 +169,14 @@ export function ErdExerciseWizard({ exercise }: ErdExerciseWizardProps) {
           {/* Legend for diff overlay */}
           {!validationResult.isFullyCorrect && (
             <div className="ml-auto flex items-center gap-3 text-xs">
-              <span className="flex items-center gap-1 text-[#22c55e]">
-                <span className="w-2 h-2 rounded-full bg-[#22c55e] inline-block" /> Correct
+              <span className="flex items-center gap-1 text-[#34d399]">
+                <span className="w-2 h-2 rounded-full bg-[#34d399] inline-block" /> Correct
               </span>
-              <span className="flex items-center gap-1 text-[#ef4444]">
-                <span className="w-2 h-2 rounded-full bg-[#ef4444] inline-block" /> Incorrect/Missing
+              <span className="flex items-center gap-1 text-[#f87171]">
+                <span className="w-2 h-2 rounded-full bg-[#f87171] inline-block" /> Incorrect/Missing
               </span>
-              <span className="flex items-center gap-1 text-[#f59e0b]">
-                <span className="w-2 h-2 rounded-full bg-[#f59e0b] inline-block" /> Extra
+              <span className="flex items-center gap-1 text-[#fbbf24]">
+                <span className="w-2 h-2 rounded-full bg-[#fbbf24] inline-block" /> Extra
               </span>
             </div>
           )}
@@ -142,7 +185,7 @@ export function ErdExerciseWizard({ exercise }: ErdExerciseWizardProps) {
 
       {/* Canvas */}
       <div className="flex-1 min-h-0">
-        <ERDCanvas validationOverlay={validationOverlay} />
+        <ERDCanvas storageKey={`exercise-${exercise.id}`} validationOverlay={validationOverlay} />
       </div>
     </div>
   )

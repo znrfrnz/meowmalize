@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import type { Edge } from '@xyflow/react'
 import type { ErdCardinality } from '@/types'
-import { X } from 'lucide-react'
+import { X, Trash2 } from 'lucide-react'
 
 const CARDINALITY_OPTIONS: { value: ErdCardinality; label: string }[] = [
   { value: 'mandatory-one', label: 'Mandatory One (||)' },
@@ -16,6 +16,7 @@ interface CardinalityPopoverProps {
   position: { x: number; y: number }
   edges: Edge[]
   onUpdate: (edgeId: string, data: Record<string, unknown>) => void
+  onDelete: (edgeId: string) => void
   onClose: () => void
 }
 
@@ -24,6 +25,7 @@ export function CardinalityPopover({
   position,
   edges,
   onUpdate,
+  onDelete,
   onClose,
 }: CardinalityPopoverProps) {
   const ref = useRef<HTMLDivElement>(null)
@@ -108,6 +110,13 @@ export function CardinalityPopover({
           </select>
         </div>
       </div>
+
+      <button
+        onClick={() => { onDelete(edgeId); onClose() }}
+        className="mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs text-[#ef4444] border border-[#27272a] rounded-lg hover:bg-[#ef4444]/10 transition-colors"
+      >
+        <Trash2 size={12} /> Delete relationship
+      </button>
     </div>
   )
 }

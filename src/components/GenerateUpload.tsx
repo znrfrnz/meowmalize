@@ -94,27 +94,27 @@ export function GenerateUpload({ onComplete }: GenerateUploadProps) {
   const isLoading = status === 'parsing' || status === 'generating'
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
+    <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col gap-6 animate-fade-up">
       <div>
-        <h1 className="text-2xl font-bold text-[#fafafa] mb-1">Generate Flashcards</h1>
+        <h1 className="text-2xl font-bold text-[#f4f4f5] mb-1 tracking-tight">Generate flashcards</h1>
         <p className="text-sm text-[#71717a]">
           Upload your lecture slides or paste text to generate AI flashcards.
         </p>
       </div>
 
       {/* Mode toggle */}
-      <div className="flex gap-2">
+      <div className="flex gap-1.5 p-1 bg-[#141414] border border-[#232326] rounded-xl w-fit">
         {(['file', 'text'] as const).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
               mode === m
-                ? 'bg-[#6366f1] text-white'
-                : 'bg-[#27272a] text-[#71717a] hover:text-[#fafafa]'
+                ? 'bg-[#6366f1]/15 text-[#a5b4fc]'
+                : 'text-[#71717a] hover:text-[#f4f4f5]'
             }`}
           >
-            {m === 'file' ? 'Upload File' : 'Paste Text'}
+            {m === 'file' ? 'Upload file' : 'Paste text'}
           </button>
         ))}
       </div>
@@ -123,16 +123,18 @@ export function GenerateUpload({ onComplete }: GenerateUploadProps) {
       {mode === 'file' ? (
         <div
           onClick={() => fileRef.current?.click()}
-          className="border-2 border-dashed border-[#27272a] rounded-xl p-10 flex flex-col items-center gap-3 cursor-pointer hover:border-[#6366f1]/50 transition-colors"
+          className="group border border-dashed border-[#232326] rounded-2xl p-10 flex flex-col items-center gap-3 cursor-pointer hover:border-[#6366f1]/40 transition-all duration-300 bg-[#141414]/50"
         >
-          <Upload size={32} className="text-[#71717a]" />
+          <div className="w-12 h-12 rounded-xl bg-[#6366f1]/10 flex items-center justify-center group-hover:bg-[#6366f1]/20 transition-colors duration-300">
+            <Upload size={24} className="text-[#6366f1]" />
+          </div>
           <p className="text-sm text-[#71717a]">
             {fileName ? (
-              <span className="text-[#fafafa] font-medium">{fileName}</span>
+              <span className="text-[#f4f4f5] font-medium">{fileName}</span>
             ) : (
               <>
                 Click to upload{' '}
-                <span className="text-[#6366f1]">PDF or PPTX</span> \u2014 max 4.5 MB
+                <span className="text-[#a5b4fc]">PDF, DOCX or PPTX</span> — max 4.5 MB
               </>
             )}
           </p>
@@ -150,29 +152,29 @@ export function GenerateUpload({ onComplete }: GenerateUploadProps) {
           onChange={(e) => setPastedText(e.target.value)}
           placeholder="Paste your lecture notes or slide text here..."
           rows={10}
-          className="w-full bg-[#1a1a1a] border border-[#27272a] rounded-xl p-4 text-sm text-[#fafafa] placeholder-[#71717a] resize-none focus:outline-none focus:border-[#6366f1] transition-colors"
+          className="w-full bg-[#141414] border border-[#232326] rounded-2xl p-4 text-sm text-[#f4f4f5] placeholder-[#3f3f46] resize-none focus:outline-none focus:border-[#6366f1]/40 transition-all duration-300"
         />
       )}
 
       {/* Error */}
       {error && (
-        <div className="flex items-start gap-2 bg-[#ef4444]/10 border border-[#ef4444]/30 rounded-lg p-3">
-          <AlertCircle size={16} className="text-[#ef4444] mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-[#ef4444]">{error}</p>
+        <div className="flex items-start gap-2 bg-[#f87171]/5 border border-[#f87171]/20 rounded-xl p-3">
+          <AlertCircle size={16} className="text-[#f87171] mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-[#f87171]">{error}</p>
         </div>
       )}
 
       {/* Loading state */}
       {isLoading && (
-        <div className="flex items-center gap-3 bg-[#1a1a1a] border border-[#27272a] rounded-lg p-4">
+        <div className="flex items-center gap-3 bg-[#141414] border border-[#232326] rounded-xl p-4">
           <Loader2 size={20} className="text-[#6366f1] animate-spin flex-shrink-0" />
           <div>
-            <p className="text-sm font-medium text-[#fafafa]">
+            <p className="text-sm font-medium text-[#f4f4f5]">
               {status === 'parsing'
                 ? 'Extracting text from file...'
                 : 'Generating flashcards with AI...'}
             </p>
-            <p className="text-xs text-[#71717a]">This may take 5\u201320 seconds</p>
+            <p className="text-xs text-[#3f3f46]">This may take 5–20 seconds</p>
           </div>
         </div>
       )}
@@ -181,10 +183,10 @@ export function GenerateUpload({ onComplete }: GenerateUploadProps) {
       <button
         onClick={handleSubmit}
         disabled={isLoading}
-        className="h-11 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+        className="h-11 rounded-xl bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
       >
         {isLoading ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
-        {isLoading ? 'Generating...' : 'Generate Flashcards'}
+        {isLoading ? 'Generating...' : 'Generate flashcards'}
       </button>
     </div>
   )

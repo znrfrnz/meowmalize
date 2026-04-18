@@ -141,31 +141,33 @@ export function StudySession({ cards }: StudySessionProps) {
   // Completion screen
   if (sessionComplete) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-[#1a1a1a] border border-[#27272a] rounded-2xl p-10 flex flex-col items-center gap-6 text-center min-h-[280px] justify-center">
-          <Trophy size={48} className="text-[#6366f1]" />
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-up">
+        <div className="bg-[#141414] border border-[#232326] rounded-2xl p-10 flex flex-col items-center gap-6 text-center min-h-[280px] justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+          <div className="w-16 h-16 rounded-2xl bg-[#6366f1]/10 flex items-center justify-center">
+            <Trophy size={32} className="text-[#6366f1]" />
+          </div>
           <div>
-            <h2 className="text-2xl font-bold text-[#fafafa] mb-2">Deck Complete!</h2>
+            <h2 className="text-2xl font-bold text-[#f4f4f5] mb-2 tracking-tight">Deck complete</h2>
             <p className="text-sm text-[#71717a]">
-              <span className="text-[#22c55e] font-medium">{knownCount} Known</span>
+              <span className="text-[#34d399] font-medium">{knownCount} Known</span>
               {' · '}
-              <span className="text-[#f59e0b] font-medium">{learningCount} Still Learning</span>
+              <span className="text-[#fbbf24] font-medium">{learningCount} Still learning</span>
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
             {learningCount > 0 && (
               <button
                 onClick={handleReviewLearning}
-                className="flex-1 h-11 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] transition-colors"
+                className="flex-1 h-10 rounded-xl bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] active:scale-[0.97] transition-all duration-300"
               >
-                Review Still Learning
+                Review learning
               </button>
             )}
             <button
               onClick={handleReshuffleAll}
-              className="flex-1 h-11 rounded-lg border border-[#27272a] bg-[#1a1a1a] text-[#fafafa] text-sm font-medium hover:bg-[#27272a] transition-colors"
+              className="flex-1 h-10 rounded-xl border border-[#232326] bg-[#141414] text-[#f4f4f5] text-sm font-medium hover:bg-[#1c1c1e] hover:border-[#3f3f46] active:scale-[0.97] transition-all duration-300"
             >
-              Reshuffle All
+              Reshuffle all
             </button>
           </div>
         </div>
@@ -175,59 +177,67 @@ export function StudySession({ cards }: StudySessionProps) {
 
   if (!currentCard) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8 text-center">
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center animate-fade-up">
         <p className="text-[#71717a] text-lg">No cards match this filter</p>
-        <p className="text-sm text-[#71717a] mt-2">Try selecting a different type, or reset your filter.</p>
+        <p className="text-sm text-[#3f3f46] mt-2">Try selecting a different type, or reset your filter.</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
+    <div className="max-w-2xl mx-auto px-4 py-10 flex flex-col gap-5 animate-fade-up">
       {/* Filter + Control Bar */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 p-1 bg-[#141414] border border-[#232326] rounded-xl">
           {(['all', 'definition', 'enumeration'] as Filter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 ${
                 filter === f
-                  ? 'bg-[#6366f1] text-white'
-                  : 'bg-[#27272a] text-[#71717a] hover:text-[#fafafa]'
+                  ? 'bg-[#6366f1]/15 text-[#a5b4fc]'
+                  : 'text-[#71717a] hover:text-[#f4f4f5]'
               }`}
             >
               {f === 'all' ? 'All' : f === 'definition' ? 'Definitions' : 'Enumerations'}
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           <button
             onClick={handleShuffle}
             aria-label="Shuffle deck"
-            className="p-2 rounded-lg bg-[#27272a] text-[#71717a] hover:text-[#fafafa] transition-colors"
+            className="p-2 rounded-xl bg-[#141414] border border-[#232326] text-[#71717a] hover:text-[#f4f4f5] hover:border-[#3f3f46] active:scale-[0.95] transition-all duration-300"
           >
-            <Shuffle size={16} />
+            <Shuffle size={15} />
           </button>
           <button
             onClick={handleReset}
             aria-label="Reset progress"
-            className="p-2 rounded-lg bg-[#27272a] text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+            className="p-2 rounded-xl bg-[#141414] border border-[#232326] text-[#f87171] hover:bg-[#f87171]/10 hover:border-[#f87171]/30 active:scale-[0.95] transition-all duration-300"
           >
-            <Trash2 size={16} />
+            <Trash2 size={15} />
           </button>
         </div>
       </div>
 
-      {/* Progress indicator */}
+      {/* Progress bar */}
       <div className="flex items-center justify-between">
         <div className="flex gap-3 text-xs">
-          <span className="text-[#22c55e] font-medium">{knownCount} Known</span>
-          <span className="text-[#f59e0b] font-medium">{learningCount} Learning</span>
+          <span className="text-[#34d399] font-medium">{knownCount} Known</span>
+          <span className="text-[#fbbf24] font-medium">{learningCount} Learning</span>
         </div>
-        <p className="font-mono text-sm text-[#71717a]">
-          Card {currentIndex + 1} of {deck.length}
+        <p className="font-mono text-xs text-[#3f3f46] tabular-nums">
+          {currentIndex + 1} / {deck.length}
         </p>
+      </div>
+
+      {/* Thin progress track */}
+      <div className="h-0.5 bg-[#232326] rounded-full overflow-hidden">
+        <div
+          className="h-full bg-[#6366f1] rounded-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          style={{ width: `${((currentIndex + 1) / deck.length) * 100}%` }}
+        />
       </div>
 
       {/* Flashcard */}
@@ -237,16 +247,16 @@ export function StudySession({ cards }: StudySessionProps) {
       <div className="flex gap-3">
         <button
           onClick={() => { markKnown(currentCard.id); goNext() }}
-          className="flex-1 h-11 rounded-lg bg-[#22c55e] text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#16a34a] transition-colors"
+          className="flex-1 h-11 rounded-xl bg-[#34d399] text-[#052e16] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#6ee7b7] active:scale-[0.97] transition-all duration-300"
         >
-          <CheckCircle size={18} />
+          <CheckCircle size={16} strokeWidth={2} />
           Know it
         </button>
         <button
           onClick={() => { markLearning(currentCard.id); goNext() }}
-          className="flex-1 h-11 rounded-lg bg-[#f59e0b] text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-[#d97706] transition-colors"
+          className="flex-1 h-11 rounded-xl bg-[#fbbf24] text-[#422006] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#fcd34d] active:scale-[0.97] transition-all duration-300"
         >
-          <RotateCcw size={18} />
+          <RotateCcw size={16} strokeWidth={2} />
           Still learning
         </button>
       </div>
@@ -256,21 +266,21 @@ export function StudySession({ cards }: StudySessionProps) {
         <button
           onClick={goPrev}
           disabled={currentIndex === 0}
-          className="px-4 py-2 rounded-lg bg-[#27272a] text-[#71717a] text-sm hover:text-[#fafafa] disabled:opacity-30 transition-colors"
+          className="px-4 py-2 rounded-xl bg-[#141414] border border-[#232326] text-[#71717a] text-sm hover:text-[#f4f4f5] hover:border-[#3f3f46] disabled:opacity-20 active:scale-[0.97] transition-all duration-300"
         >
-          ← Prev
+          Prev
         </button>
         <button
           onClick={goNext}
-          className="px-4 py-2 rounded-lg bg-[#27272a] text-[#71717a] text-sm hover:text-[#fafafa] transition-colors"
+          className="px-4 py-2 rounded-xl bg-[#141414] border border-[#232326] text-[#71717a] text-sm hover:text-[#f4f4f5] hover:border-[#3f3f46] active:scale-[0.97] transition-all duration-300"
         >
-          Next →
+          Next
         </button>
       </div>
 
       {/* Keyboard legend */}
-      <p className="text-center text-xs text-[#71717a] font-mono">
-        ← → Navigate&nbsp;&nbsp;|&nbsp;&nbsp;Space Flip&nbsp;&nbsp;|&nbsp;&nbsp;K Know it&nbsp;&nbsp;|&nbsp;&nbsp;L Still learning
+      <p className="text-center text-[11px] text-[#3f3f46] font-mono tracking-wide">
+        ← → Navigate · Space Flip · K Know it · L Still learning
       </p>
     </div>
   )

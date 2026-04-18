@@ -1,14 +1,13 @@
 'use client'
-import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react'
 import { useCallback } from 'react'
-import { useErdStore } from '@/stores/erdStore'
 import type { ErdAttribute, ErdAttributeRole } from '@/types'
 import { X, Plus } from 'lucide-react'
 
 export function EntityNode({ id, data, selected }: NodeProps) {
-  const { updateNodeData } = useErdStore()
+  const { updateNodeData } = useReactFlow()
   const tableName = data.tableName as string
-  const attributes = data.attributes as ErdAttribute[]
+  const attributes = (data.attributes as ErdAttribute[]) ?? []
 
   const setTableName = useCallback(
     (name: string) => updateNodeData(id, { tableName: name }),
@@ -48,42 +47,60 @@ export function EntityNode({ id, data, selected }: NodeProps) {
 
   return (
     <div
-      className={`bg-[#1a1a1a] border rounded-xl min-w-[180px] shadow-lg text-sm ${
-        selected ? 'border-[#6366f1]' : 'border-[#27272a]'
+      className={`bg-[#141414] border rounded-2xl min-w-[180px] shadow-[0_4px_24px_rgba(0,0,0,0.3)] text-sm transition-colors duration-300 ${
+        selected ? 'border-[#6366f1]' : 'border-[#232326]'
       }`}
     >
-      {/* Handles on all four edges */}
-      <Handle type="source" position={Position.Top} className="!bg-[#6366f1] !border-[#6366f1]" />
-      <Handle type="source" position={Position.Bottom} className="!bg-[#6366f1] !border-[#6366f1]" />
-      <Handle type="source" position={Position.Left} className="!bg-[#6366f1] !border-[#6366f1]" />
-      <Handle type="source" position={Position.Right} className="!bg-[#6366f1] !border-[#6366f1]" />
-      <Handle type="target" position={Position.Top} id="top-t" className="!bg-[#6366f1] !opacity-0" />
-      <Handle type="target" position={Position.Bottom} id="bottom-t" className="!bg-[#6366f1] !opacity-0" />
-      <Handle type="target" position={Position.Left} id="left-t" className="!bg-[#6366f1] !opacity-0" />
-      <Handle type="target" position={Position.Right} id="right-t" className="!bg-[#6366f1] !opacity-0" />
+      {/* Top handles */}
+      <Handle type="source" position={Position.Top} id="s-t1" style={{ left: '20%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Top} id="s-t2" style={{ left: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Top} id="s-t3" style={{ left: '80%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      {/* Bottom handles */}
+      <Handle type="source" position={Position.Bottom} id="s-b1" style={{ left: '20%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Bottom} id="s-b2" style={{ left: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Bottom} id="s-b3" style={{ left: '80%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      {/* Left handles */}
+      <Handle type="source" position={Position.Left} id="s-l1" style={{ top: '25%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Left} id="s-l2" style={{ top: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Left} id="s-l3" style={{ top: '75%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      {/* Right handles */}
+      <Handle type="source" position={Position.Right} id="s-r1" style={{ top: '25%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Right} id="s-r2" style={{ top: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="source" position={Position.Right} id="s-r3" style={{ top: '75%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      {/* Target handles mirror source */}
+      <Handle type="target" position={Position.Top} id="t-t1" style={{ left: '20%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Top} id="t-t2" style={{ left: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Top} id="t-t3" style={{ left: '80%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Bottom} id="t-b1" style={{ left: '20%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Bottom} id="t-b2" style={{ left: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Bottom} id="t-b3" style={{ left: '80%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Left} id="t-l1" style={{ top: '25%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Left} id="t-l2" style={{ top: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Left} id="t-l3" style={{ top: '75%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Right} id="t-r1" style={{ top: '25%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Right} id="t-r2" style={{ top: '50%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
+      <Handle type="target" position={Position.Right} id="t-r3" style={{ top: '75%' }} className="!w-1 !h-1 !bg-transparent !border-none !opacity-0" />
 
-      {/* Table name */}
-      <div className="px-3 py-2 border-b border-[#27272a] bg-[#27272a]/50 rounded-t-xl">
+      <div className="px-3 py-2 border-b border-[#232326] bg-[#1c1c1e] rounded-t-2xl">
         <input
-          className="bg-transparent text-[#fafafa] font-semibold w-full outline-none text-center placeholder:text-[#71717a]"
+          className="bg-transparent text-[#f4f4f5] font-semibold w-full outline-none text-center placeholder:text-[#3f3f46]"
           value={tableName}
           onChange={(e) => setTableName(e.target.value)}
           placeholder="Entity name"
         />
       </div>
 
-      {/* Attributes */}
       <div className="p-2 space-y-1">
         {attributes.map((attr) => (
           <div key={attr.id} className="flex items-center gap-1.5">
             <input
-              className="flex-1 bg-[#27272a] rounded px-2 py-1 text-xs outline-none text-[#fafafa] min-w-0"
+              className="flex-1 bg-[#0a0a0b] rounded-lg px-2 py-1 text-xs outline-none text-[#f4f4f5] min-w-0"
               value={attr.name}
               onChange={(e) => updateAttribute(attr.id, { name: e.target.value })}
               placeholder="attribute"
             />
             <select
-              className={`bg-[#27272a] rounded px-1 py-1 text-xs outline-none border-none ${roleBadge[attr.role]}`}
+              className={`bg-[#0a0a0b] rounded-lg px-1 py-1 text-xs outline-none border-none ${roleBadge[attr.role]}`}
               value={attr.role}
               onChange={(e) => updateAttribute(attr.id, { role: e.target.value as ErdAttributeRole })}
             >
@@ -93,7 +110,7 @@ export function EntityNode({ id, data, selected }: NodeProps) {
             </select>
             <button
               onClick={() => removeAttribute(attr.id)}
-              className="text-[#71717a] hover:text-[#ef4444] transition-colors"
+              className="text-[#71717a] hover:text-[#f87171] transition-colors duration-300"
             >
               <X size={12} />
             </button>
