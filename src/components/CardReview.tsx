@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, X, ChevronLeft } from 'lucide-react'
 import { Flashcard } from '@/types'
-import { useFlashcardStore } from '@/stores/flashcardStore'
+import { useDeckStore } from '@/stores/deckStore'
 
 interface ReviewCard {
   card: Flashcard
@@ -20,9 +20,12 @@ interface CardReviewProps {
 
 export function CardReview({ cards, onBack }: CardReviewProps) {
   const router = useRouter()
-  const { setGeneratedCards, setDeckName } = useFlashcardStore()
+  const { folders, addFolder, addDeck } = useDeckStore()
 
   const [deckNameInput, setDeckNameInput] = useState('')
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
+  const [newFolderName, setNewFolderName] = useState('')
+  const [creatingFolder, setCreatingFolder] = useState(false)
   const [items, setItems] = useState<ReviewCard[]>(
     cards.map((card) => ({
       card,
@@ -72,8 +75,14 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
 
   function handleSave() {
     const accepted = items.filter((item) => item.accepted).map((item) => item.card)
-    setGeneratedCards(accepted)
-    router.push('/generated')
+    let folderId = selectedFolderId
+    if (creatingFolder && newFolderName.trim()) {
+      const newFolder = addFolder(newFolderName.trim())
+      folderId = newFolder.id
+    }
+    const name = deckNameInput.trim() || 'My Generated Deck'
+    const newDeck = addDeck(name, folderId, accepted)
+    router.push('/decks/' + newDeck.id)
   }
 
   const acceptedCount = items.filter((i) => i.accepted).length
@@ -206,13 +215,57 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
         ))}
       </div>
 
+      {/* Deck name + folder picker */}
+      <div className="flex flex-col gap-3 p-4 border border-[#27272a] rounded-xl bg-[#1a1a1a]">
+        <div>
+          <label className="text-xs text-[#71717a] mb-1 block">Deck name</label>
+          <input
+            value={deckNameInput}
+            onChange={(e) => setDeckNameInput(e.target.value)}
+            placeholder="My Generated Deck"
+            className="w-full bg-[#0f0f0f] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#fafafa] placeholder-[#71717a] focus:outline-none focus:border-[#6366f1]"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-[#71717a] mb-1 block">Save to folder</label>
+          <select
+            value={creatingFolder ? '__new__' : (selectedFolderId ?? '')}
+            onChange={(e) => {
+              if (e.target.value === '__new__') {
+                setCreatingFolder(true)
+                setSelectedFolderId(null)
+              } else {
+                setCreatingFolder(false)
+                setSelectedFolderId(e.target.value || null)
+              }
+            }}
+            className="w-full bg-[#0f0f0f] border border-[#27272a] rounded-lg px-3 py-2 text-sm text-[#fafafa] focus:outline-none focus:border-[#6366f1]"
+          >
+            <option value="">Ungrouped</option>
+            {folders.map((f) => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+            <option value="__new__">+ New folder...</option>
+          </select>
+        </div>
+        {creatingFolder && (
+          <input
+            autoFocus
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            placeholder="New folder name..."
+            className="w-full bg-[#0f0f0f] border border-[#6366f1] rounded-lg px-3 py-2 text-sm text-[#fafafa] placeholder-[#71717a] focus:outline-none"
+          />
+        )}
+      </div>
+
       {/* Save button */}
       <button
         onClick={handleSave}
         disabled={acceptedCount === 0}
         className="h-11 rounded-lg bg-[#6366f1] text-white text-sm font-medium hover:bg-[#4f46e5] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
-        Save {acceptedCount} Card{acceptedCount !== 1 ? 's' : ''} to Study Session
+        Save {acceptedCount} Card{acceptedCount !== 1 ? 's' : ''} to Deck
       </button>
     </div>
   )
