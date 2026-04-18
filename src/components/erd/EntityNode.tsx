@@ -8,6 +8,7 @@ export function EntityNode({ id, data, selected }: NodeProps) {
   const { updateNodeData } = useReactFlow()
   const tableName = data.tableName as string
   const attributes = (data.attributes as ErdAttribute[]) ?? []
+  const validationStatus = data.validationStatus as 'correct' | 'incorrect' | 'extra' | undefined
 
   const setTableName = useCallback(
     (name: string) => updateNodeData(id, { tableName: name }),
@@ -48,7 +49,15 @@ export function EntityNode({ id, data, selected }: NodeProps) {
   return (
     <div
       className={`bg-[#141414] border rounded-2xl min-w-[180px] shadow-[0_4px_24px_rgba(0,0,0,0.3)] text-sm transition-colors duration-300 ${
-        selected ? 'border-[#6366f1]' : 'border-[#232326]'
+        validationStatus === 'correct'
+          ? 'border-[#34d399] ring-1 ring-[#34d399]/30'
+          : validationStatus === 'incorrect'
+            ? 'border-[#f87171] ring-1 ring-[#f87171]/30'
+            : validationStatus === 'extra'
+              ? 'border-[#fbbf24] ring-1 ring-[#fbbf24]/30'
+              : selected
+                ? 'border-[#6366f1]'
+                : 'border-[#232326]'
       }`}
     >
       {/* Top handles */}

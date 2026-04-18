@@ -7,6 +7,7 @@ interface CrowsFootEdgeData {
   targetCardinality: ErdCardinality
   sourceLabel?: string
   targetLabel?: string
+  validationStatus?: 'correct' | 'incorrect' | 'extra'
 }
 
 export function CrowsFootEdge({
@@ -21,6 +22,7 @@ export function CrowsFootEdge({
   const d = data as CrowsFootEdgeData | undefined
   const srcCard = d?.sourceCardinality ?? 'mandatory-one'
   const tgtCard = d?.targetCardinality ?? 'mandatory-many'
+  const validationStatus = d?.validationStatus
 
   const [edgePath] = getStraightPath({ sourceX, sourceY, targetX, targetY })
 
@@ -30,12 +32,22 @@ export function CrowsFootEdge({
   const tgtLabelX = targetX + (sourceX - targetX) * 0.2
   const tgtLabelY = targetY + (sourceY - targetY) * 0.2
 
+  const strokeColor = validationStatus === 'correct'
+    ? '#34d399'
+    : validationStatus === 'incorrect'
+      ? '#f87171'
+      : validationStatus === 'extra'
+        ? '#fbbf24'
+        : selected
+          ? '#6366f1'
+          : '#52525b'
+
   return (
     <>
       <BaseEdge
         id={id}
         path={edgePath}
-        style={{ stroke: selected ? '#6366f1' : '#52525b', strokeWidth: 1.5 }}
+        style={{ stroke: strokeColor, strokeWidth: validationStatus ? 2.5 : 1.5 }}
         markerStart={`url(#cf-${srcCard}-s)`}
         markerEnd={`url(#cf-${tgtCard}-e)`}
       />

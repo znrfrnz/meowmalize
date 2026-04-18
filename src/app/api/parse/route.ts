@@ -7,7 +7,18 @@ export const maxDuration = 60
 const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
-  // Dynamic import to avoid bundler issues
+  // Polyfill browser globals that pdfjs-dist expects (we only need text, not rendering)
+  const g = globalThis as Record<string, unknown>
+  if (!g.DOMMatrix) {
+    g.DOMMatrix = class DOMMatrix {
+      m: number[]
+      constructor() { this.m = [1, 0, 0, 1, 0, 0] }
+      isIdentity = true
+    } as unknown as typeof globalThis.DOMMatrix
+  }
+  if (!g.Path2D) g.Path2D = class Path2D {} as unknown as typeof globalThis.Path2D
+  if (!g.ImageData) g.ImageData = class ImageData {} as unknown as typeof globalThis.ImageData
+
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
   const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true }).promise
   const pages: string[] = []

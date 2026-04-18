@@ -235,8 +235,8 @@ export function ERDCanvas({ storageKey = 'free', readOnly = false, validationOve
 
       <div className="relative w-full h-full">
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={validationOverlay ? nodes.map(n => ({ ...n, data: { ...n.data, validationStatus: validationOverlay.get(n.id) } })) : nodes}
+          edges={validationOverlay ? edges.map(e => ({ ...e, data: { ...e.data, validationStatus: validationOverlay.get(e.id) } })) : edges}
           onNodesChange={readOnly ? undefined : onNodesChange}
           onEdgesChange={readOnly ? undefined : onEdgesChange}
           onConnect={readOnly ? undefined : onConnect}
