@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# planning
+.planning
+
 # markdown (except README)
 *.md
 !README.md
