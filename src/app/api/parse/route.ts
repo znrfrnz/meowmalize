@@ -6,15 +6,11 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
-const MAX_PAGES = 40
 const MAX_CHARS = 20_000
 
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
   if (fileName.match(/\.pdf$/i)) {
-    const { text } = await extractPdfText(new Uint8Array(buffer), {
-      startPage: 1,
-      endPage: MAX_PAGES,
-    })
+    const { text } = await extractPdfText(new Uint8Array(buffer))
     return (Array.isArray(text) ? text.join('\n') : text).slice(0, MAX_CHARS)
   }
   // PPTX/DOCX — use officeparser
