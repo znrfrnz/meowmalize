@@ -7,54 +7,20 @@ export const maxDuration = 60
 const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
 
 async function extractPdfText(buffer: Buffer): Promise<string> {
-  // Polyfill browser globals that pdfjs-dist expects (we only need text, not rendering)
-  const g = globalThis as Record<string, unknown>
-  if (!g.DOMMatrix) {
-    g.DOMMatrix = class DOMMatrix {
-      m: number[]
-      constructor() { this.m = [1, 0, 0, 1, 0, 0] }
-      isIdentity = true
-    } as unknown as typeof globalThis.DOMMatrix
-  }
-  if (!g.Path2D) g.Path2D = class Path2D {} as unknown as typeof globalThis.Path2D
-  if (!g.ImageData) g.ImageData = class ImageData {} as unknown as typeof globalThis.ImageData
-
-  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
-
-  // Resolve worker path — use createRequire to bypass bundler mangling
-  const { createRequire } = await import('node:module')
-  const { pathToFileURL } = await import('node:url')
-  const { existsSync } = await import('node:fs')
-  
-  let workerFileUrl: string
-  // Try createRequire first (works when __filename is real)
-  try {
-    const nodeRequire = createRequire(typeof __filename === 'string' ? __filename : '/app/server.js')
-    const resolved = nodeRequire.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs')
-    workerFileUrl = pathToFileURL(resolved).href
-  } catch {
-    // Fallback: known path on Railway (nixpacks)
-    const fallback = '/app/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs'
-    if (existsSync(fallback)) {
-      workerFileUrl = pathToFileURL(fallback).href
-    } else {
-      throw new Error('Cannot locate pdfjs-dist worker file')
-    }
-  }
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerFileUrl
-
-  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true, isEvalSupported: false }).promise
-  const pages: string[] = []
-  for (let i = 1; i <= doc.numPages; i++) {
-    const page = await doc.getPage(i)
-    const content = await page.getTextContent()
-    const text = content.items
-      .filter((item: unknown) => typeof (item as Record<string, unknown>).str === 'string')
-      .map((item: unknown) => (item as Record<string, string>).str)
-      .join(' ')
-    pages.push(text)
-  }
-  return pages.join('\n')
+  // pdf2json is pure Node.js — no workers, no canvas, no DOMMatrix
+  const PDFParser = (await import('pdf2json')).default
+  return new Promise((resolve, reject) => {
+    const parser = new PDFParser(null, true) // second arg = raw text mode
+    parser.on('pdfParser_dataReady', () => {
+      const text = (parser as unknown as { getRawTextContent: () => string }).getRawTextContent()
+      resolve(text)
+    })
+    parser.on('pdfParser_dataError', (err: { parserError: Error } | Error) => {
+      const msg = 'parserError' in err ? err.parserError.message : err.message
+      reject(new Error(msg))
+    })
+    parser.parseBuffer(buffer)
+  })
 }
 
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
