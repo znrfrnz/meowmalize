@@ -1,16 +1,33 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, ChevronLeft, X } from 'lucide-react'
+import { Plus, ChevronLeft, X, Pencil, Check } from 'lucide-react'
 import { StudySession } from '@/components/StudySession'
 import { useFlashcardStore } from '@/stores/flashcardStore'
 import { Flashcard } from '@/types'
 
 export default function GeneratedPage() {
-  const { generatedCards, addGeneratedCard, clearGeneratedCards } = useFlashcardStore()
+  const { generatedCards, addGeneratedCard, clearGeneratedCards, deckName, setDeckName } = useFlashcardStore()
   const [showForm, setShowForm] = useState(false)
   const [term, setTerm] = useState('')
   const [definition, setDefinition] = useState('')
+  const [renamingDeck, setRenamingDeck] = useState(false)
+  const [nameInput, setNameInput] = useState(deckName)
+  const nameRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (renamingDeck) {
+      setNameInput(deckName)
+      nameRef.current?.focus()
+      nameRef.current?.select()
+    }
+  }, [renamingDeck, deckName])
+
+  function commitRename() {
+    const trimmed = nameInput.trim()
+    if (trimmed) setDeckName(trimmed)
+    setRenamingDeck(false)
+  }
 
   function handleAddCard(e: React.FormEvent) {
     e.preventDefault()
@@ -55,7 +72,37 @@ export default function GeneratedPage() {
             <ChevronLeft size={16} />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-[#fafafa]">My Generated Deck</h1>
+            {renamingDeck ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  ref={nameRef}
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') commitRename()
+                    if (e.key === 'Escape') setRenamingDeck(false)
+                  }}
+                  className="h-7 px-2 rounded-lg bg-[#27272a] border border-[#6366f1] text-[#fafafa] text-base font-bold focus:outline-none w-48"
+                />
+                <button onClick={commitRename} className="text-[#22c55e] hover:text-[#16a34a] transition-colors">
+                  <Check size={15} />
+                </button>
+                <button onClick={() => setRenamingDeck(false)} className="text-[#71717a] hover:text-[#fafafa] transition-colors">
+                  <X size={15} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 group">
+                <h1 className="text-xl font-bold text-[#fafafa]">{deckName}</h1>
+                <button
+                  onClick={() => setRenamingDeck(true)}
+                  className="opacity-0 group-hover:opacity-100 text-[#52525b] hover:text-[#a1a1aa] transition-all"
+                  aria-label="Rename deck"
+                >
+                  <Pencil size={13} />
+                </button>
+              </div>
+            )}
             <p className="text-xs text-[#71717a]">{generatedCards.length} cards</p>
           </div>
         </div>

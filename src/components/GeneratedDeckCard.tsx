@@ -5,6 +5,7 @@ import { useFlashcardStore } from '@/stores/flashcardStore'
 
 export function GeneratedDeckCard() {
   const generatedCards = useFlashcardStore((s) => s.generatedCards)
+  const deckName = useFlashcardStore((s) => s.deckName)
   if (generatedCards.length === 0) return null
   return (
     <div className="border border-[#6366f1]/30 rounded-xl p-6 bg-[#1a1a1a] flex flex-col gap-4 hover:-translate-y-0.5 hover:border-[#6366f1]/60 transition-all">
@@ -12,7 +13,7 @@ export function GeneratedDeckCard() {
         <Sparkles size={20} className="text-[#6366f1]" />
       </div>
       <div>
-        <h2 className="text-xl font-semibold mb-1">My Generated Deck</h2>
+        <h2 className="text-xl font-semibold mb-1">{deckName}</h2>
         <p className="text-sm text-[#71717a]">
           {generatedCards.length} card{generatedCards.length !== 1 ? 's' : ''} from your uploaded slides.
         </p>
@@ -28,7 +29,7 @@ export function GeneratedDeckCard() {
           href="/generated/edit"
           className="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-[#27272a] text-[#71717a] text-sm hover:text-[#fafafa] hover:border-[#6366f1]/50 transition-colors"
         >
-          Edit!
+          Edit
         </Link>
       </div>
     </div>

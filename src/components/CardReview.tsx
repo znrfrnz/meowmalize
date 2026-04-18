@@ -20,8 +20,9 @@ interface CardReviewProps {
 
 export function CardReview({ cards, onBack }: CardReviewProps) {
   const router = useRouter()
-  const { setGeneratedCards } = useFlashcardStore()
+  const { setGeneratedCards, setDeckName } = useFlashcardStore()
 
+  const [deckNameInput, setDeckNameInput] = useState('')
   const [items, setItems] = useState<ReviewCard[]>(
     cards.map((card) => ({
       card,

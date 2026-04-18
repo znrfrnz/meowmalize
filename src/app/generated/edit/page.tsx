@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Plus, Trash2, Upload, X } from 'lucide-react'
+import { ChevronLeft, Plus, Trash2, Upload, X, Pencil, Check } from 'lucide-react'
 import { useFlashcardStore } from '@/stores/flashcardStore'
 import { Flashcard } from '@/types'
 
@@ -36,8 +36,11 @@ function parseImportText(raw: string): Flashcard[] {
 
 export default function EditDeckPage() {
   const router = useRouter()
-  const { generatedCards, addGeneratedCard, removeGeneratedCard, clearGeneratedCards, setGeneratedCards } = useFlashcardStore()
+  const { generatedCards, addGeneratedCard, removeGeneratedCard, clearGeneratedCards, setGeneratedCards, deckName, setDeckName } = useFlashcardStore()
   const [tab, setTab] = useState<Tab>('cards')
+  const [renamingDeck, setRenamingDeck] = useState(false)
+  const [nameInput, setNameInput] = useState(deckName)
+  const nameRef = useRef<HTMLInputElement>(null)
 
   // Add card form state
   const [term, setTerm] = useState('')
@@ -47,6 +50,20 @@ export default function EditDeckPage() {
   const [importText, setImportText] = useState('')
   const [importPreview, setImportPreview] = useState<Flashcard[]>([])
   const [importParsed, setImportParsed] = useState(false)
+
+  useEffect(() => {
+    if (renamingDeck) {
+      setNameInput(deckName)
+      nameRef.current?.focus()
+      nameRef.current?.select()
+    }
+  }, [renamingDeck, deckName])
+
+  function commitRename() {
+    const trimmed = nameInput.trim()
+    if (trimmed) setDeckName(trimmed)
+    setRenamingDeck(false)
+  }
 
   function handleDeleteDeck() {
     if (!confirm('Delete the entire generated deck? This cannot be undone.')) return
