@@ -11,11 +11,11 @@ const MAX_CHARS = 20_000
 
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
   if (fileName.match(/\.pdf$/i)) {
-    const { text, totalPages } = await extractPdfText(new Uint8Array(buffer), {
-      mergePages: false,
+    const { text } = await extractPdfText(new Uint8Array(buffer), {
+      startPage: 1,
+      endPage: MAX_PAGES,
     })
-    const pages = totalPages && totalPages > MAX_PAGES ? text.slice(0, MAX_PAGES) : text
-    return pages.join('\n').slice(0, MAX_CHARS)
+    return (Array.isArray(text) ? text.join('\n') : text).slice(0, MAX_CHARS)
   }
   // PPTX/DOCX — use officeparser
   const ast = await parseOffice(buffer, { outputErrorToConsole: false })
