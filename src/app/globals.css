@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --color-accent: #6366f1;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-destructive: #ef4444;
+  --color-muted: #71717a;
+  --color-surface: #1a1a1a;
+  --color-border: #27272a;
+}
+
+/* Flashcard flip animation */
+@layer utilities {
+  .card-3d { transform-style: preserve-3d; }
+  .card-backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .card-rotated { transform: rotateY(180deg); }
+  .card-perspective { perspective: 1000px; }
+}
