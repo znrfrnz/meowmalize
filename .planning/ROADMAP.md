@@ -53,55 +53,8 @@ AI-01, AI-02, AI-03, AI-04, AI-05, AI-06, AI-07, AI-08
 **UI hint:** yes
 
 ### Plans
-1. Normalization wizard UI — exercise list page, UNF table display with violation highlighting, step-by-step wizard shell (UNF → 1NF → 2NF → 3NF), contextual rule card per step, hint panel (progressive disclosure), back-navigation between steps
-2. Answer validation engine — TableBuilder structured input, set-based column/PK/FD validation, pass/fail feedback with explanation, correct-answer reveal on failure, multiple pre-built exercise schemas, Zustand persist for step progress
-
-### Requirements Covered
-NORM-01, NORM-02, NORM-03, NORM-04, NORM-05, NORM-06, NORM-07, NORM-08, NORM-09, NORM-10, NORM-11, NORM-12
-
-### Success Criteria
-1. User can open an exercise, see the unnormalized table with sample data, and read a contextual rule card explaining the current normal form
-2. User can input a normalized table at each step and receive pass/fail feedback with an explanation; the correct answer is shown on failure
-3. User can request a hint without immediately seeing the answer, and go back to revise a previous step
-4. User can select from multiple pre-built exercises; completed step progress is still there after a full page reload
-
----
-
-## Phase 4: ERD Simulator
-
-**Goal:** Students can freely draw Crow's Foot ERD diagrams and attempt pre-built exercises that validate their diagram against a reference answer, with undo/redo and PNG export.
-**UI hint:** yes
-
-### Plans
-1. ERD canvas + entity/relationship drawing — React Flow 12 setup with `ReactFlowProvider`, custom `EntityNode` (table name + attributes with PK/FK badges), custom `CrowsFootEdge` (cardinality markers at both ends), relationship labels, pan/zoom, select/move/delete, undo/redo via zundo, Crow's Foot legend always visible, free-draw mode saved to localStorage
-2. Exercise mode + validation + export — pre-built exercise schemas, exercise selection page, validate ERD against reference answer, diff view highlighting mismatches, clear/reset canvas, PNG export via `getViewportForBounds` + `toPng`
-
-### Requirements Covered
-ERD-01, ERD-02, ERD-03, ERD-04, ERD-05, ERD-06, ERD-07, ERD-08, ERD-09, ERD-10, ERD-11, ERD-12, ERD-13
-
-### Success Criteria
-1. User can create entity boxes with attributes (PK/FK/regular badges), draw relationships between them, and assign Crow's Foot cardinality markers (one/many/optional/mandatory) to each relationship end
-2. User can pan and zoom, select, move, delete, and undo/redo actions on the canvas; an always-visible Crow's Foot legend is shown
-3. User can choose a pre-built ERD exercise, build their diagram, and validate it — seeing a diff view that highlights missing or incorrect entities, relationships, and cardinalities
-4. User can export their current diagram as a PNG and clear the canvas to start fresh
-
-### Phase 5: Deck and Folder Management
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 4
-**Plans:** 0 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 5 to break down)
-
----
-
-## Progress Table
-
-| Phase | Name | Plans | Status | Completed |
-|-------|------|-------|--------|-----------|
-| 1 | Foundation + Flashcard Study | 0/2 | not-started | — |
-| 2 | AI Flashcard Generation | 0/2 | not-started | — |
-| 3 | Normalization Simulator | 0/2 | not-started | — |
-| 4 | ERD Simulator | 0/2 | not-started | — |
+- [ ] 03-01-PLAN.md -- Data layer + components (TableBuilder, FDInput, WizardTabs, RuleCard) + exercise list page + wizard shell
+- [ ] 03-02-PLAN.md -- Validation engine + UnfTable violation highlighting + FeedbackPanel + HintPanel + full wiring + persistence
