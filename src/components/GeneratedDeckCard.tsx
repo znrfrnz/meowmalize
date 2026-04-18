@@ -25,7 +25,7 @@ export function GeneratedDeckCard() {
           Study Deck
         </Link>
         <Link
-          href="/generate"
+          href="/generated/edit"
           className="inline-flex items-center justify-center h-10 px-4 rounded-lg border border-[#27272a] text-[#71717a] text-sm hover:text-[#fafafa] hover:border-[#6366f1]/50 transition-colors"
         >
           Regenerate
