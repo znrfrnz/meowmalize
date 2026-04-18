@@ -1,7 +1,7 @@
-'use client'
+﻿'use client'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { ProgressStatus } from '@/types'
+import { Flashcard, ProgressStatus } from '@/types'
 
 interface FlashcardState {
   progress: Record<string, ProgressStatus>
@@ -10,6 +10,9 @@ interface FlashcardState {
   resetProgress: () => void
   getKnownCount: () => number
   getLearningCount: () => number
+  generatedCards: Flashcard[]
+  setGeneratedCards: (cards: Flashcard[]) => void
+  clearGeneratedCards: () => void
 }
 
 export const useFlashcardStore = create<FlashcardState>()(
@@ -21,6 +24,9 @@ export const useFlashcardStore = create<FlashcardState>()(
       resetProgress: () => set({ progress: {} }),
       getKnownCount: () => Object.values(get().progress).filter(v => v === 'known').length,
       getLearningCount: () => Object.values(get().progress).filter(v => v === 'learning').length,
+      generatedCards: [],
+      setGeneratedCards: (cards) => set({ generatedCards: cards }),
+      clearGeneratedCards: () => set({ generatedCards: [] }),
     }),
     {
       name: 'infoman-flashcard-progress',
