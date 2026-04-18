@@ -20,9 +20,9 @@ export function GenerateUpload({ onComplete }: GenerateUploadProps) {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    const MAX = 4.5 * 1024 * 1024
+    const MAX = 50 * 1024 * 1024
     if (file.size > MAX) {
-      setError('File too large \u2014 max 4.5 MB. Try a smaller file or paste the text instead.')
+      setError('File too large — max 50 MB. Try a smaller file or paste the text instead.')
       return
     }
     setError(null)
