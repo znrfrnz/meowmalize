@@ -21,14 +21,27 @@ async function extractPdfText(buffer: Buffer): Promise<string> {
 
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
 
-  // Point worker to the actual file — must be a file:// URL for Node ESM loader
-  const path = await import('path')
-  const { pathToFileURL } = await import('url')
-  const workerPath = path.join(
-    path.dirname(require.resolve('pdfjs-dist/package.json')),
-    'legacy', 'build', 'pdf.worker.mjs'
-  )
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href
+  // Resolve worker path — use createRequire to bypass bundler mangling
+  const { createRequire } = await import('node:module')
+  const { pathToFileURL } = await import('node:url')
+  const { existsSync } = await import('node:fs')
+  
+  let workerFileUrl: string
+  // Try createRequire first (works when __filename is real)
+  try {
+    const nodeRequire = createRequire(typeof __filename === 'string' ? __filename : '/app/server.js')
+    const resolved = nodeRequire.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs')
+    workerFileUrl = pathToFileURL(resolved).href
+  } catch {
+    // Fallback: known path on Railway (nixpacks)
+    const fallback = '/app/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs'
+    if (existsSync(fallback)) {
+      workerFileUrl = pathToFileURL(fallback).href
+    } else {
+      throw new Error('Cannot locate pdfjs-dist worker file')
+    }
+  }
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerFileUrl
 
   const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true, isEvalSupported: false }).promise
   const pages: string[] = []
