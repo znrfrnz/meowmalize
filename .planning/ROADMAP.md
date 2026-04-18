@@ -56,5 +56,5 @@ AI-01, AI-02, AI-03, AI-04, AI-05, AI-06, AI-07, AI-08
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Data layer + components (TableBuilder, FDInput, WizardTabs, RuleCard) + exercise list page + wizard shell
-- [ ] 03-02-PLAN.md -- Validation engine + UnfTable violation highlighting + FeedbackPanel + HintPanel + full wiring + persistence
+- [x] 03-01-PLAN.md -- Data layer + components (TableBuilder, FDInput, WizardTabs, RuleCard) + exercise list page + wizard shell
+- [x] 03-02-PLAN.md -- Validation engine + UnfTable violation highlighting + FeedbackPanel + HintPanel + full wiring + persistence
