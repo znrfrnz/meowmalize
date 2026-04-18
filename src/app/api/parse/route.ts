@@ -20,7 +20,10 @@ async function extractPdfText(buffer: Buffer): Promise<string> {
   if (!g.ImageData) g.ImageData = class ImageData {} as unknown as typeof globalThis.ImageData
 
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
-  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true }).promise
+
+  // Disable worker — we're server-side, no need for a web worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc = ''
+  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true, isEvalSupported: false, useWorkerFetch: false, disableAutoFetch: true }).promise
   const pages: string[] = []
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i)
