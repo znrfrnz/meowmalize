@@ -91,9 +91,50 @@
 
 ## Traceability
 
-| Requirement Group | Phase |
-|-------------------|-------|
-| FLASH-01–12 | TBD by roadmapper |
-| AI-01–08 | TBD by roadmapper |
-| NORM-01–12 | TBD by roadmapper |
-| ERD-01–13 | TBD by roadmapper |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| FLASH-01 | Phase 1 | Pending |
+| FLASH-02 | Phase 1 | Pending |
+| FLASH-03 | Phase 1 | Pending |
+| FLASH-04 | Phase 1 | Pending |
+| FLASH-05 | Phase 1 | Pending |
+| FLASH-06 | Phase 1 | Pending |
+| FLASH-07 | Phase 1 | Pending |
+| FLASH-08 | Phase 1 | Pending |
+| FLASH-09 | Phase 1 | Pending |
+| FLASH-10 | Phase 1 | Pending |
+| FLASH-11 | Phase 1 | Pending |
+| FLASH-12 | Phase 1 | Pending |
+| AI-01 | Phase 2 | Pending |
+| AI-02 | Phase 2 | Pending |
+| AI-03 | Phase 2 | Pending |
+| AI-04 | Phase 2 | Pending |
+| AI-05 | Phase 2 | Pending |
+| AI-06 | Phase 2 | Pending |
+| AI-07 | Phase 2 | Pending |
+| AI-08 | Phase 2 | Pending |
+| NORM-01 | Phase 3 | Pending |
+| NORM-02 | Phase 3 | Pending |
+| NORM-03 | Phase 3 | Pending |
+| NORM-04 | Phase 3 | Pending |
+| NORM-05 | Phase 3 | Pending |
+| NORM-06 | Phase 3 | Pending |
+| NORM-07 | Phase 3 | Pending |
+| NORM-08 | Phase 3 | Pending |
+| NORM-09 | Phase 3 | Pending |
+| NORM-10 | Phase 3 | Pending |
+| NORM-11 | Phase 3 | Pending |
+| NORM-12 | Phase 3 | Pending |
+| ERD-01 | Phase 4 | Pending |
+| ERD-02 | Phase 4 | Pending |
+| ERD-03 | Phase 4 | Pending |
+| ERD-04 | Phase 4 | Pending |
+| ERD-05 | Phase 4 | Pending |
+| ERD-06 | Phase 4 | Pending |
+| ERD-07 | Phase 4 | Pending |
+| ERD-08 | Phase 4 | Pending |
+| ERD-09 | Phase 4 | Pending |
+| ERD-10 | Phase 4 | Pending |
+| ERD-11 | Phase 4 | Pending |
+| ERD-12 | Phase 4 | Pending |
+| ERD-13 | Phase 4 | Pending |
