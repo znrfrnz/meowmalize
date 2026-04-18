@@ -1,11 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Flashcard } from '@/types'
 import { GenerateUpload } from '@/components/GenerateUpload'
 import { CardReview } from '@/components/CardReview'
 
-export default function GeneratePage() {
+function GenerateContent() {
   const searchParams = useSearchParams()
   const targetDeckId = searchParams.get('deckId') ?? undefined
   const [generatedCards, setGeneratedCards] = useState<Flashcard[] | null>(null)
@@ -21,4 +21,12 @@ export default function GeneratePage() {
   }
 
   return <GenerateUpload onComplete={setGeneratedCards} />
+}
+
+export default function GeneratePage() {
+  return (
+    <Suspense>
+      <GenerateContent />
+    </Suspense>
+  )
 }

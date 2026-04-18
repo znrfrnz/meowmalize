@@ -34,3 +34,45 @@ export interface Deck {
   createdAt: string        // ISO string
   locked?: boolean         // true = built-in deck, cannot be deleted
 }
+
+//  Normalization Simulator Types 
+
+export interface FDPair {
+  lhs: string[]
+  rhs: string[]
+}
+
+export interface TableAnswer {
+  columns: Array<{ name: string; isPK: boolean }>
+  fds: FDPair[]
+}
+
+export type NormFormStep = 'UNF' | '1NF' | '2NF' | '3NF'
+
+export interface NormStepDef {
+  step: NormFormStep
+  ruleCardTitle: string
+  ruleCardBody: string
+  hints: string[]
+  correctAnswer: TableAnswer[]
+  unfViolatingColumns: string[]
+}
+
+export interface Exercise {
+  id: string
+  title: string
+  description: string
+  unfTable: {
+    columns: string[]
+    rows: Record<string, string>[]
+  }
+  steps: NormStepDef[]
+}
+
+export interface NormalizationProgress {
+  [exerciseId: string]: {
+    completedSteps: NormFormStep[]
+    stepAnswers: Partial<Record<NormFormStep, TableAnswer[]>>
+    hintIndexes: Partial<Record<NormFormStep, number>>
+  }
+}
