@@ -85,6 +85,16 @@ ERD-01, ERD-02, ERD-03, ERD-04, ERD-05, ERD-06, ERD-07, ERD-08, ERD-09, ERD-10, 
 3. User can choose a pre-built ERD exercise, build their diagram, and validate it — seeing a diff view that highlights missing or incorrect entities, relationships, and cardinalities
 4. User can export their current diagram as a PNG and clear the canvas to start fresh
 
+### Phase 5: Deck and Folder Management
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 4
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 5 to break down)
+
 ---
 
 ## Progress Table
