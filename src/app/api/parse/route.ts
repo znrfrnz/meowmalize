@@ -6,15 +6,20 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
+const MAX_PAGES = 40
+const MAX_CHARS = 20_000
 
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
   if (fileName.match(/\.pdf$/i)) {
-    const { text } = await extractPdfText(new Uint8Array(buffer))
-    return text.join('\n')
+    const { text, totalPages } = await extractPdfText(new Uint8Array(buffer), {
+      mergePages: false,
+    })
+    const pages = totalPages && totalPages > MAX_PAGES ? text.slice(0, MAX_PAGES) : text
+    return pages.join('\n').slice(0, MAX_CHARS)
   }
-  // PPTX/PPT — use officeparser
+  // PPTX/DOCX — use officeparser
   const ast = await parseOffice(buffer, { outputErrorToConsole: false })
-  return ast.toText()
+  return ast.toText().slice(0, MAX_CHARS)
 }
 
 export async function POST(req: NextRequest) {
@@ -39,15 +44,17 @@ export async function POST(req: NextRequest) {
       }
 
       if (file.size > MAX_BYTES) {
-        return NextResponse.json({ error: 'File too large — max 4.5 MB' }, { status: 413 })
+        return NextResponse.json({ error: 'File too large — max 50 MB' }, { status: 413 })
       }
 
       const allowed = [
         'application/pdf',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/msword',
       ]
-      if (!allowed.includes(file.type) && !file.name.match(/\.(pdf|pptx|ppt)$/i)) {
+      if (!allowed.includes(file.type) && !file.name.match(/\.(pdf|pptx|ppt|docx|doc)$/i)) {
         return NextResponse.json({ error: 'Only PDF and PPTX files are supported' }, { status: 415 })
       }
 
