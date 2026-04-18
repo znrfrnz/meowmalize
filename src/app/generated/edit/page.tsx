@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Plus, Trash2, Upload, X } from 'lucide-react'
 import { useFlashcardStore } from '@/stores/flashcardStore'
@@ -34,7 +35,8 @@ function parseImportText(raw: string): Flashcard[] {
 }
 
 export default function EditDeckPage() {
-  const { generatedCards, addGeneratedCard, removeGeneratedCard, setGeneratedCards } = useFlashcardStore()
+  const router = useRouter()
+  const { generatedCards, addGeneratedCard, removeGeneratedCard, clearGeneratedCards, setGeneratedCards } = useFlashcardStore()
   const [tab, setTab] = useState<Tab>('cards')
 
   // Add card form state
@@ -45,6 +47,12 @@ export default function EditDeckPage() {
   const [importText, setImportText] = useState('')
   const [importPreview, setImportPreview] = useState<Flashcard[]>([])
   const [importParsed, setImportParsed] = useState(false)
+
+  function handleDeleteDeck() {
+    if (!confirm('Delete the entire generated deck? This cannot be undone.')) return
+    clearGeneratedCards()
+    router.push('/')
+  }
 
   function handleAddCard(e: React.FormEvent) {
     e.preventDefault()
