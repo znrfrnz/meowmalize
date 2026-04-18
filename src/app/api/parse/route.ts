@@ -21,9 +21,16 @@ async function extractPdfText(buffer: Buffer): Promise<string> {
 
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
 
-  // Disable worker — we're server-side, no need for a web worker
-  pdfjsLib.GlobalWorkerOptions.workerSrc = ''
-  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true, isEvalSupported: false, useWorkerFetch: false, disableAutoFetch: true }).promise
+  // Point worker to the actual file — must be a file:// URL for Node ESM loader
+  const path = await import('path')
+  const { pathToFileURL } = await import('url')
+  const workerPath = path.join(
+    path.dirname(require.resolve('pdfjs-dist/package.json')),
+    'legacy', 'build', 'pdf.worker.mjs'
+  )
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href
+
+  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true, isEvalSupported: false }).promise
   const pages: string[] = []
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i)
