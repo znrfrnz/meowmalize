@@ -16,11 +16,12 @@ interface ReviewCard {
 interface CardReviewProps {
   cards: Flashcard[]
   onBack: () => void
+  targetDeckId?: string
 }
 
-export function CardReview({ cards, onBack }: CardReviewProps) {
+export function CardReview({ cards, onBack, targetDeckId }: CardReviewProps) {
   const router = useRouter()
-  const { folders, addFolder, addDeck } = useDeckStore()
+  const { folders, addFolder, addDeck, setDeckCards, decks } = useDeckStore()
 
   const [deckNameInput, setDeckNameInput] = useState('')
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
@@ -75,6 +76,14 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
 
   function handleSave() {
     const accepted = items.filter((item) => item.accepted).map((item) => item.card)
+    if (targetDeckId) {
+      const target = decks.find((d) => d.id === targetDeckId)
+      if (target) {
+        setDeckCards(targetDeckId, [...target.cards, ...accepted])
+        router.push('/decks/' + targetDeckId)
+        return
+      }
+    }
     let folderId = selectedFolderId
     if (creatingFolder && newFolderName.trim()) {
       const newFolder = addFolder(newFolderName.trim())
@@ -215,7 +224,8 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
         ))}
       </div>
 
-      {/* Deck name + folder picker */}
+      {/* Deck name + folder picker  only shown when creating a new deck */}
+      {!targetDeckId && (
       <div className="flex flex-col gap-3 p-4 border border-[#27272a] rounded-xl bg-[#1a1a1a]">
         <div>
           <label className="text-xs text-[#71717a] mb-1 block">Deck name</label>
@@ -258,6 +268,7 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
           />
         )}
       </div>
+      )}
 
       {/* Save button */}
       <button
@@ -270,3 +281,6 @@ export function CardReview({ cards, onBack }: CardReviewProps) {
     </div>
   )
 }
+
+
+
