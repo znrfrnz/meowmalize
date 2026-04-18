@@ -31,8 +31,8 @@ export default function RootLayout({
         <nav className="h-14 border-b border-[#27272a] flex items-center justify-between px-6">
           <span className="font-bold text-lg">Infoman Reviewer</span>
           <div className="flex gap-6 text-sm">
-            <Link href="/flashcards" className="text-[#fafafa] hover:text-[#6366f1] transition-colors">
-              Flashcards
+            <Link href="/decks" className="text-[#fafafa] hover:text-[#6366f1] transition-colors">
+              Decks
             </Link>
             <span className="text-[#71717a] cursor-not-allowed">Normalization</span>
             <span className="text-[#71717a] cursor-not-allowed">ERD</span>
