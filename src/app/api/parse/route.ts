@@ -3,9 +3,9 @@ import { parseOffice } from 'officeparser'
 import { extractText as extractPdfText } from 'unpdf'
 
 export const runtime = 'nodejs'
-export const maxDuration = 30
+export const maxDuration = 60
 
-const MAX_BYTES = 4.5 * 1024 * 1024 // 4.5 MB
+const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
 
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
   if (fileName.match(/\.pdf$/i)) {
