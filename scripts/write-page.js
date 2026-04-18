@@ -1,4 +1,6 @@
-import Link from 'next/link'
+const fs = require('fs')
+
+const content = `import Link from 'next/link'
 import { BookOpen, Table2, GitFork } from 'lucide-react'
 
 const modules = [
@@ -13,7 +15,7 @@ const modules = [
   {
     icon: Table2,
     title: 'Normalization Simulator',
-    description: 'Practice UNF → 1NF → 2NF → 3NF step-by-step.',
+    description: 'Practice UNF \u2192 1NF \u2192 2NF \u2192 3NF step-by-step.',
     href: '/normalization',
     enabled: false,
     supportsUpload: false,
@@ -39,11 +41,11 @@ export default function HomePage() {
           return (
             <div
               key={mod.title}
-              className={`border border-[#27272a] rounded-xl p-6 bg-[#1a1a1a] flex flex-col gap-4 transition-all ${
+              className={\`border border-[#27272a] rounded-xl p-6 bg-[#1a1a1a] flex flex-col gap-4 transition-all \${
                 mod.enabled
                   ? 'hover:-translate-y-0.5 hover:border-[#6366f1]/50'
                   : 'opacity-40'
-              }`}
+              }\`}
             >
               <div className="w-10 h-10 rounded-lg bg-[#27272a] flex items-center justify-center">
                 <Icon size={20} className="text-[#6366f1]" />
@@ -81,3 +83,7 @@ export default function HomePage() {
     </div>
   )
 }
+`
+
+fs.writeFileSync('src/app/page.tsx', content, 'utf8')
+console.log('page.tsx updated')
