@@ -1,7 +1,5 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 import { parseOffice } from 'officeparser'
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse')
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -10,6 +8,9 @@ const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
 
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
   if (fileName.match(/\.pdf$/i)) {
+    // Lazy-load to avoid test-file crash at module init
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfParse = require('pdf-parse')
     const { text } = await pdfParse(buffer)
     return text
   }
