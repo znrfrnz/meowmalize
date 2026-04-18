@@ -6,13 +6,26 @@ export const maxDuration = 60
 
 const MAX_BYTES = 50 * 1024 * 1024 // 50 MB
 
+async function extractPdfText(buffer: Buffer): Promise<string> {
+  // Dynamic import to avoid bundler issues
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buffer), useSystemFonts: true }).promise
+  const pages: string[] = []
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i)
+    const content = await page.getTextContent()
+    const text = content.items
+      .filter((item: unknown) => typeof (item as Record<string, unknown>).str === 'string')
+      .map((item: unknown) => (item as Record<string, string>).str)
+      .join(' ')
+    pages.push(text)
+  }
+  return pages.join('\n')
+}
+
 async function extractText(buffer: Buffer, fileName: string): Promise<string> {
   if (fileName.match(/\.pdf$/i)) {
-    // Lazy-load to avoid test-file crash at module init
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const pdfParse = require('pdf-parse')
-    const { text } = await pdfParse(buffer)
-    return text
+    return extractPdfText(buffer)
   }
   // PPTX/DOCX — use officeparser
   const result = await parseOffice(buffer, { outputErrorToConsole: false })
