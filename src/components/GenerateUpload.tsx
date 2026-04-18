@@ -134,7 +134,7 @@ export function GenerateUpload({ onComplete }: GenerateUploadProps) {
             ) : (
               <>
                 Click to upload{' '}
-                <span className="text-[#a5b4fc]">PDF, DOCX or PPTX</span> — max 4.5 MB
+                <span className="text-[#a5b4fc]">PDF, DOCX or PPTX</span>
               </>
             )}
           </p>

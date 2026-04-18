@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Infoman Reviewer",
-  description: "Study tool for Information Management concepts",
+  title: "Meowmalize",
+  description: "Study tool for Information Management",
 };
 
 export default function RootLayout({
