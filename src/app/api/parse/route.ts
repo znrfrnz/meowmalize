@@ -1,0 +1,77 @@
+﻿import { NextRequest, NextResponse } from 'next/server'
+import { parseOffice, OfficeParserAST } from 'officeparser'
+
+export const runtime = 'nodejs'
+export const maxDuration = 30
+
+const MAX_BYTES = 4.5 * 1024 * 1024 // 4.5 MB
+
+function extractText(ast: OfficeParserAST): string {
+  function walk(nodes: typeof ast.content): string {
+    return nodes
+      .map((node) => {
+        const childText = node.children ? walk(node.children) : ''
+        const nodeText = node.text ?? childText
+        return nodeText
+      })
+      .filter(Boolean)
+      .join('\n')
+  }
+  return walk(ast.content)
+}
+
+export async function POST(req: NextRequest) {
+  const contentType = req.headers.get('content-type') ?? ''
+
+  try {
+    // Text-paste path
+    if (contentType.includes('application/json')) {
+      const body = (await req.json()) as { text?: string }
+      if (!body.text || typeof body.text !== 'string') {
+        return NextResponse.json({ error: 'text field required' }, { status: 400 })
+      }
+      return NextResponse.json({ text: body.text.trim() })
+    }
+
+    // File upload path
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData()
+      const file = formData.get('file')
+      if (!file || !(file instanceof File)) {
+        return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+      }
+
+      if (file.size > MAX_BYTES) {
+        return NextResponse.json({ error: 'File too large — max 4.5 MB' }, { status: 413 })
+      }
+
+      const allowed = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.ms-powerpoint',
+      ]
+      if (!allowed.includes(file.type) && !file.name.match(/\.(pdf|pptx|ppt)$/i)) {
+        return NextResponse.json({ error: 'Only PDF and PPTX files are supported' }, { status: 415 })
+      }
+
+      const arrayBuffer = await file.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      const ast = await parseOffice(buffer, { outputErrorToConsole: false })
+      const text = extractText(ast)
+
+      if (!text || text.trim().length < 10) {
+        return NextResponse.json(
+          { error: 'Could not extract text from file — try pasting the text instead' },
+          { status: 422 }
+        )
+      }
+
+      return NextResponse.json({ text: text.trim() })
+    }
+
+    return NextResponse.json({ error: 'Unsupported content type' }, { status: 415 })
+  } catch (err) {
+    console.error('[/api/parse] error:', err)
+    return NextResponse.json({ error: 'Failed to parse file' }, { status: 500 })
+  }
+}
